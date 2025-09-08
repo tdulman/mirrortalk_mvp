@@ -31,7 +31,6 @@ class _RecordScreenState extends State<RecordScreen> {
     _init();
   }
 
-  /// İzinleri TEK TEK iste + kamerayı hazırla
   Future<void> _init() async {
     final cam = await Permission.camera.request();
     final mic = await Permission.microphone.request();
@@ -58,7 +57,7 @@ class _RecordScreenState extends State<RecordScreen> {
       await _controller!.initialize();
       if (mounted) setState(() {});
     } catch (_) {
-      setState(() => _noCamera = true); // simülatör / donanım yok
+      setState(() => _noCamera = true);
     }
   }
 
@@ -72,7 +71,6 @@ class _RecordScreenState extends State<RecordScreen> {
       await _controller!.startVideoRecording();
     }
 
-    // geri sayım
     Timer.periodic(const Duration(seconds: 1), (t) async {
       if (!mounted) { t.cancel(); return; }
       if (_remaining <= 0) {
@@ -85,34 +83,35 @@ class _RecordScreenState extends State<RecordScreen> {
   }
 
   Future<void> _stop() async {
-    String savedName;
+    File? savedFile;
 
     if (_noCamera || _controller == null || !_controller!.value.isRecordingVideo) {
-      // Simülatörde sahte bir dosya bırak (test için)
       final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/${DateTime.now().millisecondsSinceEpoch}_SIMULATED.txt');
-      await file.writeAsString('Simulated recording on simulator.');
-      savedName = file.path.split('/').last;
+      final f = File('${dir.path}/${DateTime.now().millisecondsSinceEpoch}_SIMULATED.txt');
+      await f.writeAsString('Simulated recording on simulator.');
+      savedFile = f;
     } else {
       final xfile = await _controller!.stopVideoRecording();
       final dir = await getApplicationDocumentsDirectory();
       final out = File('${dir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
       await File(xfile.path).copy(out.path);
-      savedName = out.path.split('/').last;
+      savedFile = out;
     }
 
-    // Journal’a kaydı EKLE/GÜNCELLE (append yerine upsert kullanıyoruz)
     final entry = Entry(
       id: const Uuid().v4(),
       createdAt: DateTime.now(),
       type: widget.type == RecordType.morning ? 'morning' : 'evening',
       durationSec: 120 - _remaining,
+      videoPath: savedFile.path,
     );
     await StorageService.upsert(entry);
 
     if (!mounted) return;
     setState(() => _isRecording = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved: $savedName')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Saved: ${savedFile.path.split('/').last}')),
+    );
     Navigator.pop(context);
   }
 
@@ -147,7 +146,6 @@ class _RecordScreenState extends State<RecordScreen> {
             ])
           : (_controller?.value.isInitialized == true
               ? Stack(children: [
-                  // Ayna efekti (selfie görünümü)
                   Center(
                     child: Transform(
                       alignment: Alignment.center,
@@ -172,4 +170,5 @@ class _RecordScreenState extends State<RecordScreen> {
     );
   }
 }
+
 
