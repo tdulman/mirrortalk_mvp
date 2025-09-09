@@ -1,0 +1,42 @@
+workflows:
+  ios-simulator-debug:
+    name: iOS Simulator (Debug)
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    environment:
+      flutter: stable
+      xcode: 15.2
+      cocoapods: default
+      vars:
+        IOS_SIM_DEVICE: "iPhone 15"
+        IOS_SIM_OS: "17.2"
+    scripts:
+      - name: Flutter deps
+        script: |
+          flutter --version
+          flutter pub get
+      - name: Analyze & Test
+        script: |
+          flutter analyze
+          flutter test --no-pub
+      - name: Build iOS (simulator)
+        script: |
+          flutter build ios --simulator --debug --no-codesign
+          cd build/ios/iphonesimulator
+          zip -r MirrorTalk-Simulator.app.zip Runner.app
+    artifacts:
+      - build/ios/iphonesimulator/MirrorTalk-Simulator.app.zip
+    publishing:
+      email:
+        recipients:
+          - t.dulman@gemail.com
+        notify:
+          success: true
+          failure: true
