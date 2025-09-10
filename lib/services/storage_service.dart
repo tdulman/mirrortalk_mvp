@@ -4,21 +4,22 @@ import 'package:path_provider/path_provider.dart';
 import '../models/entry.dart';
 
 class StorageService {
-  static const _fileName = 'mirrortalk_entries.json';
-
   static Future<File> _file() async {
     final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$_fileName');
+    return File('${dir.path}/mirrortalk_entries.json');
   }
 
+  /// Tüm girişleri oku (yoksa boş liste)
   static Future<List<Entry>> loadEntries() async {
     try {
       final f = await _file();
       if (!await f.exists()) return [];
       final txt = await f.readAsString();
       if (txt.trim().isEmpty) return [];
-      return Entry.decodeList(txt)
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final items = Entry.decodeList(txt);
+      // yeniler üstte
+      items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return items;
     } catch (_) {
       return [];
     }
@@ -26,9 +27,10 @@ class StorageService {
 
   static Future<void> _saveAll(List<Entry> items) async {
     final f = await _file();
-    await f.writeAsString(Entry.encodeList(items));
+    await f.writeAsString(Entry.encodeList(items), flush: true);
   }
 
+  /// Varsa günceller, yoksa ekler
   static Future<void> upsert(Entry e) async {
     final items = await loadEntries();
     final idx = items.indexWhere((x) => x.id == e.id);
@@ -45,21 +47,5 @@ class StorageService {
     items.removeWhere((e) => e.id == id);
     await _saveAll(items);
   }
-
-  /// Belirli bir tarih (yyyy-MM-dd) için en son Entry (sabah/akşam fark etmez)
-  static Future<Entry?> findByDay(DateTime dayUtc) async {
-    final items = await loadEntries();
-    final key = _dayKey(dayUtc);
-    for (final e in items) {
-      if (_dayKey(e.createdAt.toUtc()) == key) {
-        return e;
-      }
-    }
-    return null;
-  }
-
-  static String _dayKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
 }
-
-
 

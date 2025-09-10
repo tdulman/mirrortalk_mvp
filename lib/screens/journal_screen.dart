@@ -1,11 +1,11 @@
 // lib/screens/journal_screen.dart
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../models/entry.dart';
+import '../services/storage_service.dart';
+import 'record_screen.dart';
 
-import '../models/entry.dart';                 // Entry ve RecordType
-import '../services/storage_service.dart';     // StorageService
-import 'record_screen.dart';                   // RecordScreen
-
-enum Range { today, week, month, all }
+enum FilterRange { today, week, month, all }
 
 class JournalScreen extends StatefulWidget {
   const JournalScreen({super.key});
@@ -15,9 +15,9 @@ class JournalScreen extends StatefulWidget {
 }
 
 class _JournalScreenState extends State<JournalScreen> {
-  Range _range = Range.today;
-  bool _loading = true;
+  FilterRange _range = FilterRange.today;
   List<Entry> _all = [];
+  bool _loading = true;
 
   @override
   void initState() {
@@ -26,212 +26,93 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Future<void> _load() async {
-    try {
-      final items = await StorageService.loadEntries();
-      if (!mounted) return;
-      setState(() {
-        _all = items..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        _loading = false;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _loading = false);
-    }
+    setState(() => _loading = true);
+    final items = await StorageService.loadEntries();
+    setState(() {
+      _all = items;
+      _loading = false;
+    });
   }
 
-  List<Entry> get _filtered {
+  List<Entry> _filtered() {
     final now = DateTime.now();
-    final startOfToday = DateTime(now.year, now.month, now.day);
+    DateTime start;
     switch (_range) {
-      case Range.today:
-        return _all.where((e) =>
-            e.createdAt.year == now.year &&
-            e.createdAt.month == now.month &&
-            e.createdAt.day == now.day).toList();
-      case Range.week:
-        final startOfWeek =
-            startOfToday.subtract(Duration(days: startOfToday.weekday - 1)); // Pazartesi
-        return _all.where((e) => !e.createdAt.isBefore(startOfWeek)).toList();
-      case Range.month:
-        return _all
-            .where((e) => e.createdAt.year == now.year && e.createdAt.month == now.month)
-            .toList();
-      case Range.all:
+      case FilterRange.today:
+        start = DateTime(now.year, now.month, now.day);
+        break;
+      case FilterRange.week:
+        final weekday = now.weekday; // Mon=1..Sun=7
+        start = DateTime(now.year, now.month, now.day).subtract(
+          Duration(days: weekday - 1),
+        );
+        break;
+      case FilterRange.month:
+        start = DateTime(now.year, now.month, 1);
+        break;
+      case FilterRange.all:
         return _all;
     }
-  }
-
-  IconData _iconFor(RecordType t) =>
-      t == RecordType.morning ? Icons.wb_sunny_outlined : Icons.nightlight_round;
-
-  String _fmt(DateTime d) {
-    final y = d.year.toString().padLeft(4, '0');
-    final m = d.month.toString().padLeft(2, '0');
-    final day = d.day.toString().padLeft(2, '0');
-    final hh = d.hour.toString().padLeft(2, '0');
-    final mm = d.minute.toString().padLeft(2, '0');
-    return '$y-$m-$day $hh:$mm';
+    return _all.where((e) => e.createdAt.isAfter(start)).toList();
   }
 
   Future<void> _delete(String id) async {
     await StorageService.deleteById(id);
-    _load();
+    await _load();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final entries = _filtered;
-    final bottomPad = MediaQuery.of(context).viewInsets.bottom + 16;
-
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: const Text('MirrorTalk'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings coming soon')),
-              );
-            },
-          ),
-        ],
-      ),
-
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-              padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPad),
-              itemCount: _listItemCount(entries.length),
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (context, index) => _buildListItem(context, index, entries),
-            ),
-
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const RecordScreen(type: RecordType.morning),
-                      ),
-                    ).then((_) => _load());
-                  },
-                  icon: const Icon(Icons.wb_sunny_outlined),
-                  label: const Text('Morning Talk'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton.tonalIcon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const RecordScreen(type: RecordType.evening),
-                      ),
-                    ).then((_) => _load());
-                  },
-                  icon: const Icon(Icons.nightlight_round),
-                  label: const Text('Evening Talk'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+  Future<void> _openRecord(RecordType type) async {
+    final changed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => RecordScreen(type: type)),
     );
+    if (changed == true) _load();
   }
 
-  // --- ListView öğe üretimi ---
-
-  int _listItemCount(int entryCount) {
-    // 1: filtre çubukları
-    // +1: eğer Range.today ise Today Summary kartı
-    // +entryCount: kayıtlar
-    return 1 + (_range == Range.today ? 1 : 0) + entryCount;
-  }
-
-  Widget _buildListItem(BuildContext context, int index, List<Entry> entries) {
-    int cursor = 0;
-
-    // 0 -> filtreler
-    if (index == cursor) return _filters();
-    cursor++;
-
-    // (opsiyonel) Today Summary kartı
-    if (_range == Range.today) {
-      if (index == cursor) return _todaySummaryCard();
-      cursor++;
+  Widget _filterChips() {
+    ChoiceChip chip(FilterRange r, String label) {
+      return ChoiceChip(
+        label: Text(label),
+        selected: _range == r,
+        onSelected: (_) => setState(() => _range = r),
+      );
     }
 
-    // kayıtlar
-    final e = entries[index - cursor];
-    return Card(
-      child: ListTile(
-        leading: Icon(_iconFor(e.type)),
-        title: Text('${e.type.name.toUpperCase()} • ${e.durationSec}s'),
-        subtitle: Text(_fmt(e.createdAt)),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () => _delete(e.id),
-        ),
-        onTap: () {},
-      ),
-    );
-  }
-
-  // --- yardımcı widgetlar ---
-
-  Widget _filters() {
     return Wrap(
       spacing: 12,
-      runSpacing: 8,
       children: [
-        _chip('Today', Range.today),
-        _chip('This Week', Range.week),
-        _chip('This Month', Range.month),
-        _chip('All', Range.all),
+        chip(FilterRange.today, 'Today'),
+        chip(FilterRange.week, 'This Week'),
+        chip(FilterRange.month, 'This Month'),
+        chip(FilterRange.all, 'All'),
       ],
     );
   }
 
-  Widget _chip(String label, Range r) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: _range == r,
-      onSelected: (_) => setState(() => _range = r),
-    );
-  }
-
   Widget _todaySummaryCard() {
-    final title = 'Today Summary – ${_fmt(DateTime.now())}';
+    if (_range != FilterRange.today) return const SizedBox.shrink();
     return Card(
+      margin: const EdgeInsets.symmetric(vertical: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Today Summary – ${DateFormat('EEEE, MMM d').format(DateTime.now())}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 12),
-            Text('Morning Goals', style: Theme.of(context).textTheme.labelLarge),
+            Text('Morning Goals', style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             const _GoalField(hint: 'Goal 1'),
             const _GoalField(hint: 'Goal 2'),
             const _GoalField(hint: 'Goal 3'),
-            const SizedBox(height: 12),
-            Text('Evening Check', style: Theme.of(context).textTheme.labelLarge),
+            const SizedBox(height: 16),
+            Text('Evening Check', style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
-            const _CheckRow('Completed goal 1'),
-            const _CheckRow('Completed goal 2'),
-            const _CheckRow('Completed goal 3'),
+            const _CheckRow(label: 'Completed goal 1'),
+            const _CheckRow(label: 'Completed goal 2'),
+            const _CheckRow(label: 'Completed goal 3'),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
@@ -249,44 +130,134 @@ class _JournalScreenState extends State<JournalScreen> {
       ),
     );
   }
-}
-
-class _GoalField extends StatelessWidget {
-  final String hint;
-  const _GoalField({required this.hint});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: hint,
-          border: const UnderlineInputBorder(),
+    final list = _filtered();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('MirrorTalk'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: _load,
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                  children: [
+                    _filterChips(),
+                    _todaySummaryCard(),
+                    const SizedBox(height: 8),
+                    if (list.isNotEmpty)
+                      Text(
+                        _range == FilterRange.all
+                            ? 'Since ${DateFormat('yMMMd').format(list.last.createdAt)}'
+                            : DateFormat('yMMMM').format(DateTime.now()),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge
+                            ?.copyWith(color: Colors.black54),
+                      ),
+                    const SizedBox(height: 6),
+                    ...list.map((e) => _EntryTile(
+                          entry: e,
+                          onDelete: () => _delete(e.id),
+                        )),
+                  ],
+                ),
+              ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => _openRecord(RecordType.morning),
+                  icon: const Icon(Icons.wb_sunny_outlined),
+                  label: const Text('Morning Talk'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton.tonalIcon(
+                  onPressed: () => _openRecord(RecordType.evening),
+                  icon: const Icon(Icons.nightlight_round),
+                  label: const Text('Evening Talk'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+class _EntryTile extends StatelessWidget {
+  final Entry entry;
+  final VoidCallback onDelete;
+  const _EntryTile({required this.entry, required this.onDelete});
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = entry.type == RecordType.morning
+        ? Icons.wb_sunny_outlined
+        : Icons.nightlight_round;
+    final when = DateFormat('EEE, MMM d – HH:mm').format(entry.createdAt);
+
+    return Card(
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text('${entry.type.name.toUpperCase()} · ${entry.durationSec}s'),
+        subtitle: Text(when),
+        trailing: IconButton(
+          icon: const Icon(Icons.delete_outline),
+          onPressed: onDelete,
+        ),
+      ),
+    );
+  }
+}
+
+class _GoalField extends StatelessWidget {
+  final String hint;
+  const _GoalField({required this.hint});
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      decoration: InputDecoration(hintText: hint),
+    );
+    }
+}
+
 class _CheckRow extends StatefulWidget {
   final String label;
-  const _CheckRow(this.label);
-
+  const _CheckRow({required this.label});
   @override
   State<_CheckRow> createState() => _CheckRowState();
 }
 
 class _CheckRowState extends State<_CheckRow> {
   bool v = false;
-
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: Text(widget.label)),
-        Checkbox(value: v, onChanged: (b) => setState(() => v = b ?? false)),
-      ],
+    return CheckboxListTile(
+      value: v,
+      onChanged: (x) => setState(() => v = x ?? false),
+      title: Text(widget.label),
+      dense: true,
+      controlAffinity: ListTileControlAffinity.trailing,
     );
   }
 }
+

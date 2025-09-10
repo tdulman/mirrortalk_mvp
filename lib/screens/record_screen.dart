@@ -1,9 +1,11 @@
 // lib/screens/record_screen.dart
 import 'package:flutter/material.dart';
-
+import 'package:uuid/uuid.dart';
 import '../models/entry.dart';
 import '../services/storage_service.dart';
 
+/// Basit kayıt ekranı (kamera yok) – dummy bir kayıt ekler.
+/// AppBar başlığındaki tipe göre (sabah/akşam) kaydeder.
 class RecordScreen extends StatefulWidget {
   final RecordType type;
   const RecordScreen({super.key, required this.type});
@@ -15,41 +17,42 @@ class RecordScreen extends StatefulWidget {
 class _RecordScreenState extends State<RecordScreen> {
   bool _saving = false;
 
-  Future<void> _saveFakeEntry() async {
+  Future<void> _saveDummy() async {
     setState(() => _saving = true);
-    // Basit bir demo kaydı oluşturuyoruz (gerçek kayıt yerine)
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
     final e = Entry(
-      id: id,
+      id: const Uuid().v4(),
       type: widget.type,
       createdAt: DateTime.now(),
-      durationSec: 6, // örnek
-      transcript: null,
+      durationSec: 6,
+      transcript: '',
       tags: const [],
       videoPath: null,
     );
     await StorageService.upsert(e);
     if (mounted) {
-      Navigator.pop(context, true); // Listeyi yenilemek için true dön
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${widget.type.name} added')),
+      );
+      Navigator.of(context).pop(true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.type == RecordType.morning ? 'Morning Talk' : 'Evening Talk';
+    final title = widget.type == RecordType.morning
+        ? 'Morning Talk'
+        : 'Evening Talk';
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: Center(
-        child: _saving
-            ? const CircularProgressIndicator()
-            : FilledButton(
-                onPressed: _saveFakeEntry,
-                child: const Text('Save demo entry'),
-              ),
+        child: ElevatedButton.icon(
+          onPressed: _saving ? null : _saveDummy,
+          icon: const Icon(Icons.fiber_manual_record),
+          label: Text(_saving ? 'Saving...' : 'Save 6s dummy entry'),
+        ),
       ),
     );
   }
 }
-
-
 
