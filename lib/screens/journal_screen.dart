@@ -130,16 +130,23 @@ class _JournalScreenState extends State<JournalScreen> {
                         const SizedBox(height: 6),
                       ],
                       ...list.map(
-                        (e) => _EntryTile(
-                          entry: e,
-                          onDelete: () => _delete(e.id),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-      ),
+  (e) => GestureDetector(
+    onTap: () async {
+      final changed = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(builder: (_) => EntryDetailScreen(entry: e)),
+      );
+      if (changed == true && mounted) {
+        _load(); // kaydedildiyse listeyi tazele
+      }
+    },
+    child: _EntryTile(
+      entry: e,
+      onDelete: () => _delete(e.id),
+    ),
+  ),
+),
+
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
