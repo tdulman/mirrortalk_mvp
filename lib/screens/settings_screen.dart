@@ -31,21 +31,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_prefsKey, _days);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Saved')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Saved')));
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-  return Scaffold(
-    appBar: AppBar(title: const Text('Settings')),
-    body: const Center(child: CircularProgressIndicator()),
-  );
-}
-
+      return Scaffold(
+        appBar: AppBar(title: const Text('Settings')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -86,10 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _save,
-            child: const Text('Save'),
-          ),
+          FilledButton(onPressed: _save, child: const Text('Save')),
         ],
       ),
     );

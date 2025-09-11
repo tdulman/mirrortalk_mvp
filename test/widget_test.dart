@@ -14,5 +14,3 @@ void main() {
     expect(find.text('MirrorTalk'), findsOneWidget);
   });
 }
-
-

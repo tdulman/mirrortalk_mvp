@@ -21,15 +21,3 @@ class MirrorTalkApp extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
