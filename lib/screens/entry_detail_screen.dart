@@ -25,12 +25,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   Future<void> _save() async {
-    final updated =
-        widget.entry.copyWith(transcript: _txt.text, tags: _tags);
+    final updated = widget.entry.copyWith(transcript: _txt.text, tags: _tags);
     await StorageService.upsert(updated);
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Saved')));
   }
 
   void _addTag() {
@@ -55,9 +55,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     final path = widget.entry.videoPath;
     if (path == null || !await File(path).exists()) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No video file found')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No video file found')));
       return;
     }
     await Share.shareXFiles([XFile(path)], text: 'MirrorTalk video');
@@ -86,8 +86,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text('Transcript',
-              style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text(
+            'Transcript',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _txt,
@@ -104,10 +106,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             spacing: 8,
             runSpacing: 8,
             children: _tags
-                .map((t) => Chip(
-                      label: Text(t),
-                      onDeleted: () => _removeTag(t),
-                    ))
+                .map(
+                  (t) => Chip(label: Text(t), onDeleted: () => _removeTag(t)),
+                )
                 .toList(),
           ),
           const SizedBox(height: 8),

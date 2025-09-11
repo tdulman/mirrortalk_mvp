@@ -37,7 +37,9 @@ class RetentionService {
           }
           items[i] = e.copyWith(videoPath: null); // transcript kalır
           changed = true;
-        } catch (_) {/* ignore */}
+        } catch (_) {
+          /* ignore */
+        }
       }
     }
 

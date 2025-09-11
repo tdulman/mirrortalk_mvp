@@ -73,9 +73,9 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
     }
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Saved')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Saved')));
   }
 
   @override
@@ -96,14 +96,17 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Today Summary – $dateStr',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Today Summary – $dateStr',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 12),
-            Text('Morning Goals',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelLarge
-                    ?.copyWith(color: Colors.black54)),
+            Text(
+              'Morning Goals',
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: Colors.black54),
+            ),
             const SizedBox(height: 8),
             for (var i = 0; i < 3; i++) ...[
               TextField(
@@ -113,11 +116,12 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
               const SizedBox(height: 12),
             ],
             const SizedBox(height: 8),
-            Text('Evening Check',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelLarge
-                    ?.copyWith(color: Colors.black54)),
+            Text(
+              'Evening Check',
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: Colors.black54),
+            ),
             const SizedBox(height: 8),
             for (var i = 0; i < 3; i++)
               CheckboxListTile(
@@ -129,10 +133,7 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerRight,
-              child: FilledButton(
-                onPressed: _save,
-                child: const Text('Save'),
-              ),
+              child: FilledButton(onPressed: _save, child: const Text('Save')),
             ),
           ],
         ),

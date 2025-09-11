@@ -87,8 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
     await p.setBool('done2-$_todayKey', _done2);
     await p.setBool('done3-$_todayKey', _done3);
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Today summary saved')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Today summary saved')));
   }
 
   List<Entry> get _filtered {
@@ -113,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return true;
       }
     }
+
     return _all.where((e) => inRange(e.createdAt)).toList();
   }
 
@@ -151,8 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
     await StorageService.deleteById(id);
     await _loadEntries();
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Entry deleted')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Entry deleted')));
   }
 
   @override
@@ -210,10 +213,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    const Text('Today Summary',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600)),
+                                    const Text(
+                                      'Today Summary',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                     const SizedBox(height: 8),
                                     const Text('Morning Goals'),
                                     const SizedBox(height: 8),
@@ -247,24 +253,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                       value: _done1,
                                       onChanged: (v) =>
                                           setState(() => _done1 = v ?? false),
-                                      title:
-                                          const Text('Completed goal 1'),
+                                      title: const Text('Completed goal 1'),
                                     ),
                                     CheckboxListTile(
                                       contentPadding: EdgeInsets.zero,
                                       value: _done2,
                                       onChanged: (v) =>
                                           setState(() => _done2 = v ?? false),
-                                      title:
-                                          const Text('Completed goal 2'),
+                                      title: const Text('Completed goal 2'),
                                     ),
                                     CheckboxListTile(
                                       contentPadding: EdgeInsets.zero,
                                       value: _done3,
                                       onChanged: (v) =>
                                           setState(() => _done3 = v ?? false),
-                                      title:
-                                          const Text('Completed goal 3'),
+                                      title: const Text('Completed goal 3'),
                                     ),
                                     Align(
                                       alignment: Alignment.centerRight,
@@ -285,17 +288,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: SegmentedButton<JournalRange>(
                             segments: const [
                               ButtonSegment(
-                                  value: JournalRange.today,
-                                  label: Text('Today')),
+                                value: JournalRange.today,
+                                label: Text('Today'),
+                              ),
                               ButtonSegment(
-                                  value: JournalRange.week,
-                                  label: Text('This Week')),
+                                value: JournalRange.week,
+                                label: Text('This Week'),
+                              ),
                               ButtonSegment(
-                                  value: JournalRange.month,
-                                  label: Text('This Month')),
+                                value: JournalRange.month,
+                                label: Text('This Month'),
+                              ),
                               ButtonSegment(
-                                  value: JournalRange.all,
-                                  label: Text('All')),
+                                value: JournalRange.all,
+                                label: Text('All'),
+                              ),
                             ],
                             selected: {_range},
                             onSelectionChanged: (s) =>
@@ -309,7 +316,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Text(
                             _captionForRange(),
                             style: const TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.w600),
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                         const Divider(height: 1),
@@ -336,12 +345,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           leading: Icon(icon),
                           title: Text(
                             '${e.type.toUpperCase()} • ${e.durationSec}s',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                           subtitle: Text(
-                            DateFormat('EEE, MMM d • HH:mm')
-                                .format(e.createdAt),
+                            DateFormat(
+                              'EEE, MMM d • HH:mm',
+                            ).format(e.createdAt),
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete),
@@ -352,8 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    EntryDetailScreen(entry: e),
+                                builder: (_) => EntryDetailScreen(entry: e),
                               ),
                             ).then((_) => _loadEntries());
                           },
@@ -443,8 +451,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _save() async {
     await RetentionService.setDays(_days);
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Saved')));
   }
 
   @override
@@ -461,8 +470,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text('Video Retention (days)',
-              style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text(
+            'Video Retention (days)',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 8),
           DropdownButton<int>(
             value: _days,
@@ -477,16 +488,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           FilledButton(onPressed: _save, child: const Text('Save')),
           const SizedBox(height: 24),
           const Text(
-              'Old videos older than the selected days will be removed automatically.\nTranscripts remain saved.'),
+            'Old videos older than the selected days will be removed automatically.\nTranscripts remain saved.',
+          ),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-
