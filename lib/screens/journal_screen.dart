@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import '../models/entry.dart';
 import '../services/storage_service.dart';
 import 'record_screen.dart';
+import '../screens/today_summary_card.dart';
+
+
 
 enum FilterRange { today, week, month, all }
 
@@ -182,7 +185,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     const SizedBox(height: 8),
                     if (_range == FilterRange.today) ...[
   const SizedBox(height: 8),
-  _todaySummaryCard(),    
+  const TodaySummaryCard(),    
 ],
                     if (list.isEmpty)
                       _EmptyState(onAdd: _reload)

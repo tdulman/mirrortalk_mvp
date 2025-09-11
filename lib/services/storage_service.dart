@@ -3,6 +3,16 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import '../models/entry.dart';
 
+  // lib/services/storage_service.dart  (dosyanın sonuna yakın, class içine)
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import '../models/day_summary.dart';
+
+// --- DaySummary storage helpers ---
+
+
+
 class StorageService {
   static Future<File> _file() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -47,5 +57,47 @@ class StorageService {
     items.removeWhere((e) => e.id == id);
     await _saveAll(items);
   }
+
+static Future<File> _daySummaryFile() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return File('${dir.path}/day_summaries.json');
+}
+
+static Future<Map<String, dynamic>> _readDaySummaryMap() async {
+  final f = await _daySummaryFile();
+  if (await f.exists() == false) {
+    await f.writeAsString(jsonEncode({}));
+    return {};
+  }
+  final txt = await f.readAsString();
+  try {
+    final m = jsonDecode(txt);
+    if (m is Map<String, dynamic>) return m;
+    return {};
+  } catch (_) {
+    return {};
+  }
+}
+
+static Future<void> _writeDaySummaryMap(Map<String, dynamic> m) async {
+  final f = await _daySummaryFile();
+  await f.writeAsString(jsonEncode(m));
+}
+
+static Future<DaySummary> loadDaySummary(DateTime day) async {
+  final map = await _readDaySummaryMap();
+  final key = DaySummary.emptyFor(day).dayKey;
+  if (map.containsKey(key)) {
+    return DaySummary.fromJson(map[key] as Map<String, dynamic>);
+  }
+  return DaySummary.emptyFor(day);
+}
+
+static Future<void> upsertDaySummary(DaySummary s) async {
+  final map = await _readDaySummaryMap();
+  map[s.dayKey] = s.toJson();
+  await _writeDaySummaryMap(map);
+}
+
 }
 
