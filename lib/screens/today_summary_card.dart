@@ -1,9 +1,9 @@
-// lib/screens/today_summary_card.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/entry.dart';
+
+import '../models/day_summary.dart';
 import '../services/storage_service.dart';
-import 'package:uuid/uuid.dart';
 
 class TodaySummaryCard extends StatefulWidget {
   const TodaySummaryCard({super.key});
@@ -13,127 +13,149 @@ class TodaySummaryCard extends StatefulWidget {
 }
 
 class _TodaySummaryCardState extends State<TodaySummaryCard> {
-  final _goalCtrls = List.generate(3, (_) => TextEditingController());
-  final _checks = [false, false, false];
   bool _loading = true;
+  late DaySummary _summary;
+
+  final _g1 = TextEditingController();
+  final _g2 = TextEditingController();
+  final _g3 = TextEditingController();
+
+  bool _c1 = false;
+  bool _c2 = false;
+  bool _c3 = false;
 
   @override
   void initState() {
     super.initState();
-    _loadExisting();
+    _load();
   }
 
-  Future<void> _loadExisting() async {
-    setState(() => _loading = true);
-    final today = DateTime.now().toUtc();
-    final entry = await StorageService.findByDay(today);
-    if (entry?.summary != null) {
-      final s = entry!.summary!;
-      for (var i = 0; i < 3; i++) {
-        _goalCtrls[i].text = (i < s.goals.length) ? s.goals[i] : '';
-        _checks[i] = (i < s.eveningChecks.length) ? s.eveningChecks[i] : false;
-      }
-    }
-    if (mounted) setState(() => _loading = false);
+  Future<void> _load() async {
+    final today = DateTime.now();
+    final s = await StorageService.loadDaySummary(today);
+    if (!mounted) return;
+
+    setState(() {
+      _summary = s;
+      _g1.text = s.goals[0] ?? '';
+      _g2.text = s.goals[1] ?? '';
+      _g3.text = s.goals[2] ?? '';
+      _c1 = s.completed[0] ?? false;
+      _c2 = s.completed[1] ?? false;
+      _c3 = s.completed[2] ?? false;
+      _loading = false;
+    });
+  }
+
+  Future<void> _save() async {
+    final updated = _summary.copyWith(
+      goals: [_g1.text.trim(), _g2.text.trim(), _g3.text.trim()],
+      completed: [_c1, _c2, _c3],
+    );
+    await StorageService.upsertDaySummary(updated);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Saved')),
+    );
   }
 
   @override
   void dispose() {
-    for (final c in _goalCtrls) {
-      c.dispose();
-    }
+    _g1.dispose();
+    _g2.dispose();
+    _g3.dispose();
     super.dispose();
-  }
-
-  Future<void> _save() async {
-    final todayUtc = DateTime.now().toUtc();
-    final existing = await StorageService.findByDay(todayUtc);
-
-    final summary = DaySummary(
-      goals: _goalCtrls.map((e) => e.text.trim()).toList(),
-      eveningChecks: List<bool>.from(_checks),
-    );
-
-    if (existing != null) {
-      await StorageService.upsert(existing.copyWith(summary: summary));
-    } else {
-      // O gün hiç kayıt yoksa “sanal” bir entry açalım (type: morning, duration 0)
-      final id = const Uuid().v4();
-      final e = Entry(
-        id: id,
-        type: RecordType.morning,
-        createdAt: DateTime.now().toUtc(),
-        durationSec: 0,
-        transcript: null,
-        tags: const [],
-        videoPath: null,
-        summary: summary,
-      );
-      await StorageService.upsert(e);
-    }
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Saved')));
   }
 
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.all(16),
-        child: Center(child: CircularProgressIndicator()),
+      return const Card(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 
     final dateStr = DateFormat('EEEE, MMM d').format(DateTime.now());
 
     return Card(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Başlık
             Text(
-              'Today Summary – $dateStr',
-              style: Theme.of(context).textTheme.titleMedium,
+              "Today's Summary – $dateStr",
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Text(
-              'Morning Goals',
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge?.copyWith(color: Colors.black54),
+
+            // Morning Goals
+            Text('Morning Goals',
+                style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _g1,
+              decoration: const InputDecoration(
+                hintText: 'Goal 1',
+                border: UnderlineInputBorder(),
+              ),
+            ),
+            TextField(
+              controller: _g2,
+              decoration: const InputDecoration(
+                hintText: 'Goal 2',
+                border: UnderlineInputBorder(),
+              ),
+            ),
+            TextField(
+              controller: _g3,
+              decoration: const InputDecoration(
+                hintText: 'Goal 3',
+                border: UnderlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Evening Check
+            Text('Evening Check',
+                style: Theme.of(context).textTheme.titleSmall),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Completed goal 1'),
+              value: _c1,
+              onChanged: (v) => setState(() => _c1 = v ?? false),
+              controlAffinity: ListTileControlAffinity.trailing,
+            ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Completed goal 2'),
+              value: _c2,
+              onChanged: (v) => setState(() => _c2 = v ?? false),
+              controlAffinity: ListTileControlAffinity.trailing,
+            ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Completed goal 3'),
+              value: _c3,
+              onChanged: (v) => setState(() => _c3 = v ?? false),
+              controlAffinity: ListTileControlAffinity.trailing,
             ),
             const SizedBox(height: 8),
-            for (var i = 0; i < 3; i++) ...[
-              TextField(
-                controller: _goalCtrls[i],
-                decoration: InputDecoration(hintText: 'Goal ${i + 1}'),
-              ),
-              const SizedBox(height: 12),
-            ],
-            const SizedBox(height: 8),
-            Text(
-              'Evening Check',
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge?.copyWith(color: Colors.black54),
-            ),
-            const SizedBox(height: 8),
-            for (var i = 0; i < 3; i++)
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('Completed goal ${i + 1}'),
-                value: _checks[i],
-                onChanged: (v) => setState(() => _checks[i] = v ?? false),
-              ),
-            const SizedBox(height: 8),
+
+            // Save
             Align(
               alignment: Alignment.centerRight,
-              child: FilledButton(onPressed: _save, child: const Text('Save')),
+              child: FilledButton(
+                onPressed: _save,
+                child: const Text('Save'),
+              ),
             ),
           ],
         ),
@@ -141,3 +163,4 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
     );
   }
 }
+
