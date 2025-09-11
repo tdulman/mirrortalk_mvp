@@ -36,7 +36,7 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
-  Future<void> _reload() => _load();
+  Future<void> _reload() async => _load();
 
   List<Entry> _filtered() {
     if (_range == FilterRange.all) return _all;
@@ -71,12 +71,16 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Future<void> _openRecord(RecordType type) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => RecordScreen(type: type)),
-    );
-    await _reload();
-  }
+  await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => RecordScreen(type: type),
+    ),
+  );
+  // geri dönünce listeyi yenile
+  _reload();
+}
+
 
   @override
   Widget build(BuildContext context) {
