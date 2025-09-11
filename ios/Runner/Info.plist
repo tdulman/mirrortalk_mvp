@@ -4,9 +4,9 @@
 
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Record your self-talk videos.</string>
+	<string>We need camera access to record your self-talk.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Capture your voice for self-talk.</string>
+	<string>CWe need microphone access for video recording.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Transcribe your self-talk recordings into text.</string>
 	<key>CFBundleDevelopmentRegion</key>
