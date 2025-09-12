@@ -1,13 +1,11 @@
-import 'dart:async';                     
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/entry.dart';
 import '../services/storage_service.dart';
 import 'record_screen.dart';
-import '../screens/today_summary_card.dart';
-
-
+import 'entry_detail_screen.dart';
+import 'today_summary_card.dart';
 
 enum FilterRange { today, week, month, all }
 
@@ -19,26 +17,22 @@ class JournalScreen extends StatefulWidget {
 }
 
 class _JournalScreenState extends State<JournalScreen> {
-  // ---- State alanları ----
+  // --- State ---
   FilterRange _range = FilterRange.today;
   List<Entry> _all = <Entry>[];
   bool _loading = true;
 
-  // ---- Lifecycle ----
   @override
   void initState() {
     super.initState();
     _load();
   }
 
-  // ---- Data yükleme / yenileme ----
+  // --- Data ---
   Future<void> _load() async {
     setState(() => _loading = true);
     final items = await StorageService.loadEntries();
-
-    // yeni -> eski sıralama
-    items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
+    items.sort((a, b) => b.createdAt.compareTo(a.createdAt)); // yeni -> eski
     if (!mounted) return;
     setState(() {
       _all = items;
@@ -48,12 +42,10 @@ class _JournalScreenState extends State<JournalScreen> {
 
   Future<void> _reload() async => _load();
 
-  // ---- Filtreli liste ----
   List<Entry> _filtered() {
     if (_range == FilterRange.all) return _all;
 
     final now = DateTime.now();
-    // Non-nullable uyarısı için güvenli default
     DateTime start = DateTime(1970);
 
     switch (_range) {
@@ -61,57 +53,35 @@ class _JournalScreenState extends State<JournalScreen> {
         start = DateTime(now.year, now.month, now.day);
         break;
       case FilterRange.week:
-        // Hafta başlangıcı: Pazartesi
-        final weekday = now.weekday; // 1..7
-        start = DateTime(now.year, now.month, now.day)
-            .subtract(Duration(days: weekday - 1));
+        final wd = now.weekday; // 1..7 (Mon..Sun)
+        start =
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: wd - 1));
         break;
       case FilterRange.month:
         start = DateTime(now.year, now.month, 1);
         break;
       case FilterRange.all:
-        // Yukarıda return ile dönüyoruz; burası çalışmaz ama derleyici memnun olsun
         start = DateTime(1970);
         break;
     }
 
-    return _all.where((e) => e.createdAt.isAfter(start)).toList()
+    return _all
+        .where((e) => e.createdAt.isAfter(start))
+        .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
-  // ---- Kayıt ekranı aç ----
   Future<void> _openRecord(RecordType type) async {
     final changed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (_) => RecordScreen(type: type)),
     );
-
     if (changed == true && mounted) {
       _reload();
     }
   }
 
-  // ---- Today Summary başlığı ----
-  Widget _todaySummaryCard() {
-  return Card(
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Today’s Summary',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text('Sabah ve akşam kayıtlarını buradan takip edin.'),
-        ],
-      ),
-    ),
-  );
-}
-
-  // ---- Filtre butonları ----
+  // --- UI helpers ---
   Widget _filterChips() {
     String label(FilterRange r) {
       switch (r) {
@@ -156,7 +126,13 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  // ---- UI ----
+  // --- Silme ---
+  Future<void> _delete(String id) async {
+    await StorageService.deleteById(id);
+    await _load();
+  }
+
+  // --- BUILD ---
   @override
   Widget build(BuildContext context) {
     final list = _filtered();
@@ -168,8 +144,8 @@ class _JournalScreenState extends State<JournalScreen> {
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Settings',
-            onPressed: () {}, // ileride açacağız
-          )
+            onPressed: () {}, // ileride eklenecek
+          ),
         ],
       ),
       body: SafeArea(
@@ -178,15 +154,14 @@ class _JournalScreenState extends State<JournalScreen> {
             : RefreshIndicator(
                 onRefresh: _reload,
                 child: ListView(
-                  padding:
-                      const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 100.0), // altta butonlar için boşluk
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
                   children: [
                     _filterChips(),
                     const SizedBox(height: 8),
                     if (_range == FilterRange.today) ...[
-  const SizedBox(height: 8),
-  const TodaySummaryCard(),    
-],
+                      const SizedBox(height: 8),
+                      TodaySummaryCard(), // const DEĞİL
+                    ],
                     if (list.isEmpty)
                       _EmptyState(onAdd: _reload)
                     else ...[
@@ -199,12 +174,15 @@ class _JournalScreenState extends State<JournalScreen> {
                               ),
                         ),
                       const SizedBox(height: 6),
-                      ...list.map(
-                        (e) => _EntryTile(
-                          entry: e,
-                          onDelete: () => _delete(e.id),
-                        ),
-                      ),
+                      ...list
+                          .map(
+                            (e) => _EntryTile(
+                              entry: e,
+                              onDelete: () => _delete(e.id),
+                              onChanged: _reload,
+                            ),
+                          )
+                          .toList(),
                     ],
                   ],
                 ),
@@ -236,18 +214,15 @@ class _JournalScreenState extends State<JournalScreen> {
       ),
     );
   }
-
-  // ---- Silme ----
-  Future<void> _delete(String id) async {
-    await StorageService.deleteById(id);
-    await _load();
-  }
 }
 
-// --- Boş liste durumu ---
+// =====================
+// AŞAĞIDAKİLER SINIF DIŞI
+// =====================
+
 class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.onAdd, super.key});
   final VoidCallback onAdd;
-  const _EmptyState({required this.onAdd});
 
   @override
   Widget build(BuildContext context) {
@@ -265,15 +240,9 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: onAdd,
-              child: const Text('Morning Talk Başlat'),
-            ),
+            FilledButton(onPressed: onAdd, child: const Text('Morning Talk Başlat')),
             const SizedBox(height: 12),
-            FilledButton(
-              onPressed: onAdd,
-              child: const Text('Evening Talk Başlat'),
-            ),
+            FilledButton(onPressed: onAdd, child: const Text('Evening Talk Başlat')),
           ],
         ),
       ),
@@ -281,12 +250,17 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-// --- Liste öğesi ---
 class _EntryTile extends StatelessWidget {
-  const _EntryTile({required this.entry, required this.onDelete});
+  const _EntryTile({
+    required this.entry,
+    required this.onDelete,
+    required this.onChanged,
+    super.key,
+  });
 
   final Entry entry;
   final VoidCallback onDelete;
+  final VoidCallback onChanged;
 
   IconData _icon() {
     switch (entry.type) {
@@ -308,16 +282,41 @@ class _EntryTile extends StatelessWidget {
           '${entry.type.name.toUpperCase()} · ${entry.durationSec}s',
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        subtitle: Text(when),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(when),
+            if (entry.tags.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children:
+                    entry.tags.map((t) => Chip(label: Text(t))).toList(),
+              ),
+            ],
+          ],
+        ),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline),
           onPressed: onDelete,
           tooltip: 'Delete',
         ),
+        onTap: () async {
+          final changed = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => EntryDetailScreen(entry: entry),
+            ),
+          );
+          if (changed == true) onChanged();
+        },
       ),
     );
   }
 }
+
+
 
 
 
