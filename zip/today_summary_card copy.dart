@@ -45,6 +45,7 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
   }
 
   DaySummary _normalize(DaySummary s) {
+    // Liste uzunluklarını garanti et
     final goals = List<String>.from(s.goals);
     final done = List<bool>.from(s.done);
     while (goals.length < 3) goals.add('');
@@ -55,28 +56,35 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
   void _toggle(int index, bool value) {
     final next = List<bool>.from(_summary.done);
     next[index] = value;
+
     setState(() {
       _summary = _summary.copyWith(done: next);
     });
+
     StorageService.upsertDaySummary(_summary);
     widget.onChanged?.call(_summary);
   }
 
   Future<void> _save() async {
     setState(() => _saving = true);
+
     final newGoals = <String>[
       _g1.text.trim(),
       _g2.text.trim(),
       _g3.text.trim(),
     ];
+
     final updated = _summary.copyWith(goals: newGoals);
     setState(() => _summary = updated);
+
     await StorageService.upsertDaySummary(updated);
+
     if (!mounted) return;
     setState(() => _saving = false);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Today summary saved')),
     );
+
     widget.onChanged?.call(updated);
   }
 
@@ -93,18 +101,36 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            _GoalRow(label: 'Goal 1', controller: _g1, value: _summary.done[0], onChanged: (v) => _toggle(0, v)),
+
+            _GoalRow(
+              label: 'Goal 1',
+              controller: _g1,
+              value: _summary.done[0],
+              onChanged: (v) => _toggle(0, v),
+            ),
             const SizedBox(height: 8),
-            _GoalRow(label: 'Goal 2', controller: _g2, value: _summary.done[1], onChanged: (v) => _toggle(1, v)),
+            _GoalRow(
+              label: 'Goal 2',
+              controller: _g2,
+              value: _summary.done[1],
+              onChanged: (v) => _toggle(1, v),
+            ),
             const SizedBox(height: 8),
-            _GoalRow(label: 'Goal 3', controller: _g3, value: _summary.done[2], onChanged: (v) => _toggle(2, v)),
+            _GoalRow(
+              label: 'Goal 3',
+              controller: _g3,
+              value: _summary.done[2],
+              onChanged: (v) => _toggle(2, v),
+            ),
+
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _saving ? null : _save,
                 child: _saving
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(
+                        width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Text('Save'),
               ),
             ),
@@ -137,8 +163,9 @@ class _GoalRow extends StatelessWidget {
         Expanded(
           child: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: label,
+              border: const OutlineInputBorder(),
               isDense: true,
             ),
           ),

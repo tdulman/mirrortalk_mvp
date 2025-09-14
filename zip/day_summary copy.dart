@@ -1,10 +1,13 @@
 // lib/models/day_summary.dart
 //
-// Stage 4 uyumlu model (eski schema ile de çalışır):
-// - dayKey: 'YYYY-MM-DD'
-// - goals: List<String> (3 eleman, boş string olabilir)
-// - done : List<bool>    (3 eleman)
-// fromJson: goal1/2/3 ve done1/2/3'ü de okur.
+// ► TEK STANDART API
+//   - dayKey: 'YYYY-MM-DD' (gün kimliği)
+//   - goals : List<String> (3 eleman, boş string olabilir)
+//   - done  : List<bool>   (3 eleman)
+//
+// ► GERİYE DÖNÜK UYUMLULUK
+//   - fromJson() eski şemayı da okur: goal1/2/3 ve done1/2/3
+//   - StorageService uyumu için: DaySummary.emptyFor(DateTime) ve .dayKey mevcut
 
 class DaySummary {
   final String dayKey;
@@ -18,12 +21,14 @@ class DaySummary {
   })  : goals = _normGoals(goals),
         done = _normDone(done);
 
+  // Gün anahtarı üret (YYYY-MM-DD)
   static String makeDayKey(DateTime day) {
     final d = DateTime(day.year, day.month, day.day);
     String two(int n) => n < 10 ? '0$n' : '$n';
     return '${d.year}-${two(d.month)}-${two(d.day)}';
   }
 
+  // StorageService bu fabrikayı çağırıyor
   factory DaySummary.emptyFor(DateTime day) =>
       DaySummary(dayKey: makeDayKey(day));
 
@@ -39,7 +44,7 @@ class DaySummary {
     );
   }
 
-  // ---------- JSON ----------
+  // ----- JSON -----
   factory DaySummary.fromJson(Map<String, dynamic> json) {
     final dk = (json['dayKey'] ?? json['day'] ?? json['date'] ??
             makeDayKey(DateTime.now()))
@@ -48,7 +53,7 @@ class DaySummary {
     List<String>? goals;
     if (json['goals'] is List) {
       goals = (json['goals'] as List)
-          .map((e) => e == null ? '' : e.toString())
+          .map((e) => (e == null) ? '' : e.toString())
           .toList();
     } else {
       final g1 = json['goal1'], g2 = json['goal2'], g3 = json['goal3'];
@@ -85,7 +90,7 @@ class DaySummary {
         'done': done,
       };
 
-  // ---------- Helpers ----------
+  // ----- Helpers -----
   static List<String> _normGoals(List<String>? input) {
     final out = <String>[];
     if (input != null) out.addAll(input.take(3));
@@ -100,4 +105,7 @@ class DaySummary {
     return out;
   }
 }
+
+
+
 
