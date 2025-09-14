@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../models/day_summary.dart';
 import '../models/entry.dart';
 import '../services/storage_service.dart';
+import '../services/streak_service.dart';
 import 'today_summary_card.dart';
 import 'record_screen.dart';
 import 'entry_detail_screen.dart';
@@ -25,6 +26,12 @@ class _JournalScreenState extends State<JournalScreen> {
 
   DaySummary? _todaySummary;
 
+  // >>> Faz 6 alanları
+  StreakInfo? _streak;
+  int _goalsDoneThisWeek = 0;
+  bool _celebratedToday = false;
+  // <<<
+
   @override
   void initState() {
     super.initState();
@@ -39,12 +46,48 @@ class _JournalScreenState extends State<JournalScreen> {
 
     final today = await StorageService.getDaySummary(DateTime.now());
 
+    // Streak hesapla
+    final streak = StreakService.compute(entries: items);
+
+    // Haftalık goals done sayısını hesapla (Pazartesi..Pazar)
+    int doneCount = 0;
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: (now.weekday - 1)));
+    for (int i = 0; i < 7; i++) {
+      final ds = await StorageService.getDaySummary(
+        DateTime(monday.year, monday.month, monday.day).add(Duration(days: i)),
+      );
+      doneCount += ds.done.where((d) => d == true).length;
+    }
+
     if (!mounted) return;
     setState(() {
       _all = items;
       _todaySummary = today;
+      _streak = StreakInfo(
+        current: streak.current,
+        longest: streak.longest,
+        thisWeekDays: streak.thisWeekDays,
+        goalsDoneThisWeek: doneCount,
+      );
+      _goalsDoneThisWeek = doneCount; // (kart içinde de gösteriyoruz)
       _loading = false;
     });
+
+    // Basit kutlama: bugün ilk entry varsa ve henüz kutlamadıysak
+    final todayKey = DaySummary.makeDayKey(DateTime.now());
+    final todayHadEntry = items.any(
+      (e) => DaySummary.makeDayKey(e.createdAt) == todayKey,
+    );
+    if (todayHadEntry && !_celebratedToday) {
+      _celebratedToday = true;
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Nice! You're on a streak — keep it going 🔥"),
+        ),
+      );
+    }
   }
 
   Future<void> _reload() async => _load();
@@ -87,37 +130,50 @@ class _JournalScreenState extends State<JournalScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
                   children: [
-  _filterChips(),
-  const SizedBox(height: 8),
+                    // >>> Streak Kartı (Faz 6)
+                    if (_streak != null) ...[
+                      _StreakCard(
+                        current: _streak!.current,
+                        longest: _streak!.longest,
+                        thisWeekDays: _streak!.thisWeekDays,
+                        goalsDoneThisWeek: _streak!.goalsDoneThisWeek,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    // <<<
 
-  if (_range == FilterRange.today) ...[
-    TodaySummaryCard(
-      summary: (_todaySummary ?? DaySummary.emptyFor(DateTime.now())),
-      onChanged: (s) {
-        setState(() => _todaySummary = s);
-      },
-    ),
-  ],
+                    _filterChips(),
+                    const SizedBox(height: 8),
 
-  if (list.isEmpty)
-    _EmptyState(onAdd: _reload)
-  else ...[
-    Text(
-      'From ${DateFormat('yyyy-MM-dd').format(list.last.createdAt)} '
-      'to ${DateFormat('yyyy-MM-dd').format(DateTime.now())}',
-      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-        color: Colors.black54,
-      ),
-    ),
-    const SizedBox(height: 6),
-    ...list.map((e) => _EntryTile(
-          entry: e,
-          onDelete: () => _delete(e.id),
-          onChanged: _reload,
-        )),
-  ],
-],
+                    if (_range == FilterRange.today) ...[
+                      TodaySummaryCard(
+                        summary: (_todaySummary ??
+                            DaySummary.emptyFor(DateTime.now())),
+                        onChanged: (s) {
+                          setState(() => _todaySummary = s);
+                        },
+                      ),
+                    ],
 
+                    if (list.isEmpty)
+                      _EmptyState(onAdd: _reload)
+                    else ...[
+                      Text(
+                        'From ${DateFormat('yyyy-MM-dd').format(list.last.createdAt)} '
+                        'to ${DateFormat('yyyy-MM-dd').format(DateTime.now())}',
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge
+                            ?.copyWith(color: Colors.black54),
+                      ),
+                      const SizedBox(height: 6),
+                      ...list.map((e) => _EntryTile(
+                            entry: e,
+                            onDelete: () => _delete(e.id),
+                            onChanged: _reload,
+                          )),
+                    ],
+                  ],
                 ),
               ),
       ),
@@ -229,4 +285,66 @@ class _EntryTile extends StatelessWidget {
     );
   }
 }
+
+class _StreakCard extends StatelessWidget {
+  final int current;
+  final int longest;
+  final int thisWeekDays;
+  final int goalsDoneThisWeek;
+
+  const _StreakCard({
+    required this.current,
+    required this.longest,
+    required this.thisWeekDays,
+    required this.goalsDoneThisWeek,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            _StatBox(title: 'Streak', value: '$current'),
+            const SizedBox(width: 12),
+            _StatBox(title: 'Best', value: '$longest'),
+            const SizedBox(width: 12),
+            _StatBox(title: 'Active days', value: '$thisWeekDays/wk'),
+            const SizedBox(width: 12),
+            _StatBox(title: 'Goals done', value: '$goalsDoneThisWeek/wk'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatBox extends StatelessWidget {
+  final String title;
+  final String value;
+  const _StatBox({required this.title, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.black12),
+        ),
+        child: Column(
+          children: [
+            Text(value, style: t.titleMedium),
+            const SizedBox(height: 4),
+            Text(title, style: t.labelMedium?.copyWith(color: Colors.black54)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
