@@ -5,6 +5,8 @@ import '../models/entry.dart';
 import '../models/day_summary.dart';
 import '../services/storage_service.dart';
 import '../services/goal_suggester.dart';
+import 'voice_record_screen.dart';
+
 
 class RecordScreen extends StatefulWidget {
   const RecordScreen({super.key});
@@ -85,20 +87,34 @@ class _RecordScreenState extends State<RecordScreen> {
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: _transcriptCtrl,
-              minLines: 3,
-              maxLines: 8,
-              decoration: const InputDecoration(
-                labelText: 'Transcript (optional)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: _save,
-              icon: const Icon(Icons.save),
-              label: const Text('Save'),
-            ),
+  controller: _transcriptCtrl,
+  minLines: 3,
+  maxLines: 8,
+  decoration: const InputDecoration(
+    labelText: 'Transcript (optional)',
+    border: OutlineInputBorder(),
+  ),
+),
+const SizedBox(height: 12),
+FilledButton.icon(
+  onPressed: () async {
+    final res = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const VoiceRecordScreen()),
+    );
+    if (res != null && res.trim().isNotEmpty) {
+      _transcriptCtrl.text = res.trim();
+    }
+  },
+  icon: const Icon(Icons.mic),
+  label: const Text('Record voice'),
+),
+const SizedBox(height: 16),
+FilledButton.icon(
+  onPressed: _save,
+  icon: const Icon(Icons.save),
+  label: const Text('Save'),
+),
+
           ],
         ),
       ),
