@@ -2,7 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 
+
+
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We use the microphone to capture your voice notes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>We convert your speech to text to suggest goals.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need camera access to record your self-talk.</string>
 	<key>NSMicrophoneUsageDescription</key>
