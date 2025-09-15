@@ -41,7 +41,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final when = DateFormat('EEE, MMM d • HH:mm').format(widget.entry.createdAt);
+    final when =
+        DateFormat('EEE, MMM d • HH:mm').format(widget.entry.createdAt);
     return Scaffold(
       appBar: AppBar(title: const Text('Entry Detail')),
       body: Padding(
@@ -80,7 +81,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                FilledButton(onPressed: _addTagFromInput, child: const Text('Add'))
+                FilledButton(
+                    onPressed: _addTagFromInput, child: const Text('Add'))
               ],
             ),
           ],

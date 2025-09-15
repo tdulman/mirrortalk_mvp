@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/prefs_service.dart';
-import '../services/notification_service.dart' show NotificationService, NotificationPlanner;
-
+import '../services/notification_service.dart'
+    show NotificationService, NotificationPlanner;
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -50,12 +50,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _pickMorning() async {
-    final picked = await showTimePicker(context: context, initialTime: _morning);
+    final picked =
+        await showTimePicker(context: context, initialTime: _morning);
     if (picked != null) setState(() => _morning = picked);
   }
 
   Future<void> _pickEvening() async {
-    final picked = await showTimePicker(context: context, initialTime: _evening);
+    final picked =
+        await showTimePicker(context: context, initialTime: _evening);
     if (picked != null) setState(() => _evening = picked);
   }
 
@@ -84,99 +86,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  if (_loading) {
-    // ⚠️ Burada 'const Scaffold' KULLANMIYORUZ çünkü AppBar const değil.
+  Widget build(BuildContext context) {
+    if (_loading) {
+      // ⚠️ Burada 'const Scaffold' KULLANMIYORUZ çünkü AppBar const değil.
+      return Scaffold(
+        appBar: AppBar(title: const Text('Settings')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: const Center(child: CircularProgressIndicator()),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // ===== Reminders section =====
+          Text(
+            'Daily reminders',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          _RowTile(
+            title: 'Morning reminder',
+            value: _morning.format(context),
+            onTap: _pickMorning,
+          ),
+          const SizedBox(height: 8),
+          _RowTile(
+            title: 'Evening reminder',
+            value: _evening.format(context),
+            onTap: _pickEvening,
+          ),
+
+          const SizedBox(height: 24),
+
+          // ===== Retention section =====
+          Text(
+            'Data retention on this device',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 12),
+          _RetentionTile(
+            label: '1 week (7 days)',
+            selected: _days == 7,
+            onTap: () => setState(() => _days = 7),
+          ),
+          _RetentionTile(
+            label: '1 month (30 days)',
+            selected: _days == 30,
+            onTap: () => setState(() => _days = 30),
+          ),
+          _RetentionTile(
+            label: '3 months (90 days)',
+            selected: _days == 90,
+            onTap: () => setState(() => _days = 90),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Text('Custom:'),
+              const SizedBox(width: 12),
+              _NumberStepper(
+                value: _days,
+                onChanged: (v) => setState(() => _days = v.clamp(1, 365)),
+              ),
+              const SizedBox(width: 8),
+              const Text('days'),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _saving ? null : _save,
+              child: _saving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Save'),
+            ),
+          ),
+        ],
+      ),
     );
   }
-
-  return Scaffold(
-    appBar: AppBar(title: const Text('Settings')),
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // ===== Reminders section =====
-        Text(
-          'Daily reminders',
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
-        _RowTile(
-          title: 'Morning reminder',
-          value: _morning.format(context),
-          onTap: _pickMorning,
-        ),
-        const SizedBox(height: 8),
-        _RowTile(
-          title: 'Evening reminder',
-          value: _evening.format(context),
-          onTap: _pickEvening,
-        ),
-
-        const SizedBox(height: 24),
-
-        // ===== Retention section =====
-        Text(
-          'Data retention on this device',
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 12),
-        _RetentionTile(
-          label: '1 week (7 days)',
-          selected: _days == 7,
-          onTap: () => setState(() => _days = 7),
-        ),
-        _RetentionTile(
-          label: '1 month (30 days)',
-          selected: _days == 30,
-          onTap: () => setState(() => _days = 30),
-        ),
-        _RetentionTile(
-          label: '3 months (90 days)',
-          selected: _days == 90,
-          onTap: () => setState(() => _days = 90),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            const Text('Custom:'),
-            const SizedBox(width: 12),
-            _NumberStepper(
-              value: _days,
-              onChanged: (v) => setState(() => _days = v.clamp(1, 365)),
-            ),
-            const SizedBox(width: 8),
-            const Text('days'),
-          ],
-        ),
-
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: _saving ? null : _save,
-            child: _saving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Save'),
-          ),
-        ),
-      ],
-    ),
-  );
-}
 }
 
 // ===== Helper widgets (senin mevcut bileşenlerini koruyoruz) =====
@@ -185,7 +187,8 @@ class _RetentionTile extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _RetentionTile({required this.label, required this.selected, required this.onTap});
+  const _RetentionTile(
+      {required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +198,7 @@ class _RetentionTile extends StatelessWidget {
       trailing: selected ? const Icon(Icons.check_circle) : null,
       onTap: onTap,
     );
-    }
+  }
 }
 
 class _NumberStepper extends StatelessWidget {
@@ -227,7 +230,8 @@ class _RowTile extends StatelessWidget {
   final String title;
   final String value;
   final VoidCallback onTap;
-  const _RowTile({required this.title, required this.value, required this.onTap});
+  const _RowTile(
+      {required this.title, required this.value, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -241,7 +245,9 @@ class _RowTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Expanded(child: Text(title, style: Theme.of(context).textTheme.bodyLarge)),
+            Expanded(
+                child:
+                    Text(title, style: Theme.of(context).textTheme.bodyLarge)),
             Text(value, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(width: 4),
             const Icon(Icons.chevron_right),

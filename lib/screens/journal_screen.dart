@@ -60,12 +60,14 @@ class _JournalScreenState extends State<JournalScreen> {
 
     // light celebration when first entry is added today
     final todayKey = DaySummary.makeDayKey(DateTime.now());
-    final todayHadEntry = items.any((e) => DaySummary.makeDayKey(e.createdAt) == todayKey);
+    final todayHadEntry =
+        items.any((e) => DaySummary.makeDayKey(e.createdAt) == todayKey);
     if (todayHadEntry && !_celebratedToday) {
       _celebratedToday = true;
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Nice! You're on a habit streak — keep it going 🔥")),
+        const SnackBar(
+            content: Text("Nice! You're on a habit streak — keep it going 🔥")),
       );
     }
   }
@@ -123,20 +125,22 @@ class _JournalScreenState extends State<JournalScreen> {
                     ],
                     _filterChips(),
                     const SizedBox(height: 8),
-
                     if (_range == FilterRange.today)
                       TodaySummaryCard(
-                        summary: _todaySummary ?? DaySummary.emptyFor(DateTime.now()),
+                        summary: _todaySummary ??
+                            DaySummary.emptyFor(DateTime.now()),
                         onChanged: (s) => setState(() => _todaySummary = s),
                       ),
-
                     if (list.isEmpty)
                       _EmptyState(onAdd: _onAddPressed)
                     else ...[
                       Text(
                         'From ${DateFormat('yyyy-MM-dd').format(list.last.createdAt)} '
                         'to ${DateFormat('yyyy-MM-dd').format(DateTime.now())}',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.black54),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge
+                            ?.copyWith(color: Colors.black54),
                       ),
                       const SizedBox(height: 6),
                       ...list.map(
@@ -212,7 +216,10 @@ class _EmptyState extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('No entries yet',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             const Text(
               "Tap 'Add' to create your first record. "
@@ -224,7 +231,8 @@ class _EmptyState extends StatelessWidget {
                 Icon(Icons.lightbulb_outline, size: 18),
                 SizedBox(width: 6),
                 Expanded(
-                  child: Text('Tip: marking at least one goal as Done counts toward your streak.'),
+                  child: Text(
+                      'Tip: marking at least one goal as Done counts toward your streak.'),
                 ),
               ],
             ),
@@ -248,7 +256,8 @@ class _EntryTile extends StatelessWidget {
   final Future<void> Function() onDelete;
   final Future<void> Function() onChanged;
 
-  const _EntryTile({required this.entry, required this.onDelete, required this.onChanged});
+  const _EntryTile(
+      {required this.entry, required this.onDelete, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -301,14 +310,14 @@ class _StreakCard extends StatelessWidget {
             const SizedBox(width: 12),
             _StatBox(title: 'Active days', value: '${thisWeekDays ?? 0}/wk'),
             const SizedBox(width: 12),
-            _StatBox(title: 'Goals done', value: '${goalsDoneThisWeek ?? 0}/wk'),
+            _StatBox(
+                title: 'Goals done', value: '${goalsDoneThisWeek ?? 0}/wk'),
           ],
         ),
       ),
     );
   }
 }
-
 
 class _StatBox extends StatelessWidget {
   final String title;
@@ -336,6 +345,3 @@ class _StatBox extends StatelessWidget {
     );
   }
 }
-
-
-

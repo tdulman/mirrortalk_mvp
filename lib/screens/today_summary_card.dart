@@ -5,7 +5,8 @@ import '../services/storage_service.dart';
 class TodaySummaryCard extends StatefulWidget {
   final DaySummary summary;
   final ValueChanged<DaySummary> onChanged;
-  const TodaySummaryCard({super.key, required this.summary, required this.onChanged});
+  const TodaySummaryCard(
+      {super.key, required this.summary, required this.onChanged});
 
   @override
   State<TodaySummaryCard> createState() => _TodaySummaryCardState();
@@ -38,7 +39,10 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Today's Summary",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
             _goalRow(0, hint: 'e.g., Read 20 pages of a book'),
             const SizedBox(height: 8),

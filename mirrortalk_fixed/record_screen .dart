@@ -7,7 +7,6 @@ import '../services/storage_service.dart';
 import '../services/goal_suggester.dart';
 import 'voice_record_screen.dart';
 
-
 class RecordScreen extends StatefulWidget {
   const RecordScreen({super.key});
 
@@ -70,8 +69,10 @@ class _RecordScreenState extends State<RecordScreen> {
             const SizedBox(height: 6),
             SegmentedButton<RecordType>(
               segments: const [
-                ButtonSegment(value: RecordType.morning, label: Text('Morning')),
-                ButtonSegment(value: RecordType.evening, label: Text('Evening')),
+                ButtonSegment(
+                    value: RecordType.morning, label: Text('Morning')),
+                ButtonSegment(
+                    value: RecordType.evening, label: Text('Evening')),
               ],
               selected: <RecordType>{_type},
               onSelectionChanged: (s) => setState(() => _type = s.first),
@@ -87,34 +88,33 @@ class _RecordScreenState extends State<RecordScreen> {
             ),
             const SizedBox(height: 12),
             TextField(
-  controller: _transcriptCtrl,
-  minLines: 3,
-  maxLines: 8,
-  decoration: const InputDecoration(
-    labelText: 'Transcript (optional)',
-    border: OutlineInputBorder(),
-  ),
-),
-const SizedBox(height: 12),
-FilledButton.icon(
-  onPressed: () async {
-    final res = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) => const VoiceRecordScreen()),
-    );
-    if (res != null && res.trim().isNotEmpty) {
-      _transcriptCtrl.text = res.trim();
-    }
-  },
-  icon: const Icon(Icons.mic),
-  label: const Text('Record voice'),
-),
-const SizedBox(height: 16),
-FilledButton.icon(
-  onPressed: _save,
-  icon: const Icon(Icons.save),
-  label: const Text('Save'),
-),
-
+              controller: _transcriptCtrl,
+              minLines: 3,
+              maxLines: 8,
+              decoration: const InputDecoration(
+                labelText: 'Transcript (optional)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: () async {
+                final res = await Navigator.of(context).push<String>(
+                  MaterialPageRoute(builder: (_) => const VoiceRecordScreen()),
+                );
+                if (res != null && res.trim().isNotEmpty) {
+                  _transcriptCtrl.text = res.trim();
+                }
+              },
+              icon: const Icon(Icons.mic),
+              label: const Text('Record voice'),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: _save,
+              icon: const Icon(Icons.save),
+              label: const Text('Save'),
+            ),
           ],
         ),
       ),
@@ -138,9 +138,12 @@ class _SuggestionSheetState extends State<_SuggestionSheet> {
   @override
   void initState() {
     super.initState();
-    g1 = TextEditingController(text: widget.suggestions.isNotEmpty ? widget.suggestions[0] : '');
-    g2 = TextEditingController(text: widget.suggestions.length > 1 ? widget.suggestions[1] : '');
-    g3 = TextEditingController(text: widget.suggestions.length > 2 ? widget.suggestions[2] : '');
+    g1 = TextEditingController(
+        text: widget.suggestions.isNotEmpty ? widget.suggestions[0] : '');
+    g2 = TextEditingController(
+        text: widget.suggestions.length > 1 ? widget.suggestions[1] : '');
+    g3 = TextEditingController(
+        text: widget.suggestions.length > 2 ? widget.suggestions[2] : '');
   }
 
   @override
@@ -165,27 +168,39 @@ class _SuggestionSheetState extends State<_SuggestionSheet> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16, right: 16, top: 16,
+        left: 16,
+        right: 16,
+        top: 16,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Suggested goals', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Suggested goals',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           TextField(
             controller: g1,
-            decoration: const InputDecoration(labelText: 'Goal 1', border: OutlineInputBorder(), isDense: true),
+            decoration: const InputDecoration(
+                labelText: 'Goal 1',
+                border: OutlineInputBorder(),
+                isDense: true),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: g2,
-            decoration: const InputDecoration(labelText: 'Goal 2', border: OutlineInputBorder(), isDense: true),
+            decoration: const InputDecoration(
+                labelText: 'Goal 2',
+                border: OutlineInputBorder(),
+                isDense: true),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: g3,
-            decoration: const InputDecoration(labelText: 'Goal 3', border: OutlineInputBorder(), isDense: true),
+            decoration: const InputDecoration(
+                labelText: 'Goal 3',
+                border: OutlineInputBorder(),
+                isDense: true),
           ),
           const SizedBox(height: 12),
           SizedBox(

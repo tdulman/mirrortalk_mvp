@@ -85,7 +85,6 @@ class _JournalScreenState extends State<JournalScreen> {
           ),
         ],
       ),
-
       body: SafeArea(
         child: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -96,7 +95,6 @@ class _JournalScreenState extends State<JournalScreen> {
                   children: [
                     _filterChips(),
                     const SizedBox(height: 8),
-
                     if (_range == FilterRange.today) ...[
                       TodaySummaryCard(
                         summary: (_todaySummary ??
@@ -108,7 +106,6 @@ class _JournalScreenState extends State<JournalScreen> {
                         },
                       ),
                     ],
-
                     if (list.isEmpty)
                       _EmptyState(onAdd: _reload)
                     else ...[
@@ -130,7 +127,6 @@ class _JournalScreenState extends State<JournalScreen> {
                 ),
               ),
       ),
-
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -219,8 +215,7 @@ class _EntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtitle =
-        DateFormat('EEE, MMM d • HH:mm').format(entry.createdAt);
+    final subtitle = DateFormat('EEE, MMM d • HH:mm').format(entry.createdAt);
     return Card(
       child: ListTile(
         title: Text(entry.type.name.toUpperCase()),

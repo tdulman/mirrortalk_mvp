@@ -31,14 +31,18 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
-          alert: true, badge: false, sound: true,
+          alert: true,
+          badge: false,
+          sound: true,
         );
 
     await _plugin
         .resolvePlatformSpecificImplementation<
             MacOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
-          alert: true, badge: false, sound: true,
+          alert: true,
+          badge: false,
+          sound: true,
         );
   }
 
@@ -63,7 +67,8 @@ class NotificationService {
       scheduled,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'daily', 'Daily',
+          'daily',
+          'Daily',
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -85,12 +90,12 @@ class NotificationService {
 
 // ====== AŞAĞIDAKİLER TOP-LEVEL (sınıfın DIŞINDA) OLMALI ======
 
-
 // (Kullanılmıyorsa NotificationPlans'ı tamamen silebilirsin)
 class NotificationPlans {
   final int morningH, morningM;
   final int eveningH, eveningM;
-  const NotificationPlans(this.morningH, this.morningM, this.eveningH, this.eveningM);
+  const NotificationPlans(
+      this.morningH, this.morningM, this.eveningH, this.eveningM);
 }
 
 class NotificationPlanner {
@@ -100,16 +105,20 @@ class NotificationPlanner {
 
     await NotificationService.cancelAll();
     await NotificationService.scheduleDaily(
-      id: 100, hour: mh, minute: mm,
-      title: 'Morning focus', body: 'What do you want to accomplish today?',
+      id: 100,
+      hour: mh,
+      minute: mm,
+      title: 'Morning focus',
+      body: 'What do you want to accomplish today?',
     );
     await NotificationService.scheduleDaily(
-      id: 101, hour: eh, minute: em,
-      title: 'Evening check-in', body: 'What did you get done today?',
+      id: 101,
+      hour: eh,
+      minute: em,
+      title: 'Evening check-in',
+      body: 'What did you get done today?',
     );
   }
 }
 
-
 // (İstersen NotificationPlans sınıfını silebilirsin; kullanılmıyor.)
-

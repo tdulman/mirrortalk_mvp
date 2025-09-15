@@ -52,21 +52,20 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   Future<void> _save() async {
-  setState(() => _saving = true);
+    setState(() => _saving = true);
 
-  final updated = widget.entry.copyWith(
-    transcript: _txt.text.trim().isEmpty ? null : _txt.text.trim(),
-    tags: _tags,
-  );
+    final updated = widget.entry.copyWith(
+      transcript: _txt.text.trim().isEmpty ? null : _txt.text.trim(),
+      tags: _tags,
+    );
 
-  await StorageService.upsert(updated);
+    await StorageService.upsert(updated);
 
-  if (!mounted) return;
-  setState(() => _saving = false);
+    if (!mounted) return;
+    setState(() => _saving = false);
 
-  Navigator.pop(context, true); // sadece 1 kez, true ile dön
-}
-
+    Navigator.pop(context, true); // sadece 1 kez, true ile dön
+  }
 
   void _addTagFromInput() {
     final t = _tagCtrl.text.trim();
@@ -84,62 +83,61 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   Widget _tagEditor() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const SizedBox(height: 16),
-      Text('Tags', style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 8),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text('Tags', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
 
-      // Giriş + Ekle butonu / Klavyeden enter ile de ekler
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _tagCtrl,
-              decoration: const InputDecoration(
-                hintText: 'Add a tag and press Enter',
-                border: OutlineInputBorder(),
-                isDense: true,
+        // Giriş + Ekle butonu / Klavyeden enter ile de ekler
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _tagCtrl,
+                decoration: const InputDecoration(
+                  hintText: 'Add a tag and press Enter',
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+                onSubmitted: (_) => _addTagFromInput(),
               ),
-              onSubmitted: (_) => _addTagFromInput(),
             ),
-          ),
-          const SizedBox(width: 8),
-          FilledButton(
-            onPressed: _addTagFromInput,
-            child: const Text('Add'),
-          ),
-        ],
-      ),
+            const SizedBox(width: 8),
+            FilledButton(
+              onPressed: _addTagFromInput,
+              child: const Text('Add'),
+            ),
+          ],
+        ),
 
-      const SizedBox(height: 12),
-      _tagChips(),
-    ],
-  );
-}
-
-Widget _tagChips() {
-  if (_tags.isEmpty) {
-    return const Text(
-      'No tags yet.',
-      style: TextStyle(color: Colors.black54),
+        const SizedBox(height: 12),
+        _tagChips(),
+      ],
     );
   }
 
-  return Wrap(
-    spacing: 8,
-    runSpacing: 8,
-    children: _tags.map((t) {
-      return Chip(
-        label: Text(t),
-        deleteIcon: const Icon(Icons.close),
-        onDeleted: () => _removeTag(t),
+  Widget _tagChips() {
+    if (_tags.isEmpty) {
+      return const Text(
+        'No tags yet.',
+        style: TextStyle(color: Colors.black54),
       );
-    }).toList(),
-  );
-}
+    }
 
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _tags.map((t) {
+        return Chip(
+          label: Text(t),
+          deleteIcon: const Icon(Icons.close),
+          onDeleted: () => _removeTag(t),
+        );
+      }).toList(),
+    );
+  }
 
   Widget _videoPlayer() {
     final c = _video;
@@ -210,10 +208,10 @@ Widget _tagChips() {
                   if (_video != null) const SizedBox(height: 16),
 
                   // Transcript
-                  Text('Transcript', style: Theme.of(context).textTheme.titleMedium),
+                  Text('Transcript',
+                      style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   TextField(
-                    
                     controller: _txt,
                     maxLines: 6,
                     decoration: const InputDecoration(
@@ -272,4 +270,3 @@ Widget _tagChips() {
     );
   }
 }
-

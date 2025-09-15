@@ -20,7 +20,8 @@ class RecordScreen extends StatefulWidget {
   State<RecordScreen> createState() => _RecordScreenState();
 }
 
-class _RecordScreenState extends State<RecordScreen> with WidgetsBindingObserver {
+class _RecordScreenState extends State<RecordScreen>
+    with WidgetsBindingObserver {
   CameraController? _controller;
   bool _initializing = true;
   bool _noCamera = false;
@@ -88,9 +89,9 @@ class _RecordScreenState extends State<RecordScreen> with WidgetsBindingObserver
       }
 
       // Ön kamera tercih
-      CameraDescription cam =
-          cams.firstWhere((c) => c.lensDirection == CameraLensDirection.front,
-              orElse: () => cams.first);
+      CameraDescription cam = cams.firstWhere(
+          (c) => c.lensDirection == CameraLensDirection.front,
+          orElse: () => cams.first);
 
       final controller = CameraController(
         cam,
@@ -242,7 +243,8 @@ class _RecordScreenState extends State<RecordScreen> with WidgetsBindingObserver
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.type == RecordType.morning ? 'Morning Talk' : 'Evening Talk';
+    final title =
+        widget.type == RecordType.morning ? 'Morning Talk' : 'Evening Talk';
 
     return Scaffold(
       appBar: AppBar(
@@ -287,7 +289,8 @@ class _RecordScreenState extends State<RecordScreen> with WidgetsBindingObserver
               Expanded(
                 child: FilledButton.icon(
                   onPressed: _isRecording ? _stopAndSave : _start,
-                  icon: Icon(_isRecording ? Icons.stop : Icons.fiber_manual_record),
+                  icon: Icon(
+                      _isRecording ? Icons.stop : Icons.fiber_manual_record),
                   label: Text(_isRecording ? 'Stop & Save' : 'Start Recording'),
                 ),
               ),
@@ -336,6 +339,3 @@ class _NoCamera extends StatelessWidget {
     );
   }
 }
-
-
-

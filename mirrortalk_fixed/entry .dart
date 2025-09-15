@@ -44,8 +44,7 @@ class Entry {
       durationSec:
           (m['durationSec'] is num) ? (m['durationSec'] as num).toInt() : 0,
       transcript: m['transcript'] as String?,
-      tags:
-          (m['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      tags: (m['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       videoPath: m['videoPath'] as String?,
     );
   }
@@ -56,8 +55,6 @@ class Entry {
   static List<Entry> decodeList(String txt) {
     if (txt.trim().isEmpty) return <Entry>[];
     final raw = jsonDecode(txt) as List<dynamic>;
-    return raw
-        .map((e) => Entry.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return raw.map((e) => Entry.fromJson(e as Map<String, dynamic>)).toList();
   }
 }

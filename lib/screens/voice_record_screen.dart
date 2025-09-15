@@ -57,7 +57,9 @@ class _VoiceRecordScreenState extends State<VoiceRecordScreen> {
           'You can enable permissions in your device settings.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
@@ -106,7 +108,9 @@ class _VoiceRecordScreenState extends State<VoiceRecordScreen> {
                   child: FilledButton.icon(
                     onPressed: _starting ? null : _toggle,
                     icon: Icon(_listening ? Icons.stop : Icons.mic),
-                    label: Text(_listening ? 'Stop' : (_starting ? 'Starting…' : 'Start Recording')),
+                    label: Text(_listening
+                        ? 'Stop'
+                        : (_starting ? 'Starting…' : 'Start Recording')),
                   ),
                 ),
                 const SizedBox(width: 8),

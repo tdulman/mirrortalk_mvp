@@ -62,7 +62,8 @@ class Entry {
         createdAt: DateTime.parse(m['createdAt'] as String),
         durationSec: (m['durationSec'] as num).toInt(),
         transcript: m['transcript'] as String?,
-        tags: (m['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+        tags:
+            (m['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
         videoPath: m['videoPath'] as String?,
       );
 
@@ -75,4 +76,3 @@ class Entry {
     return raw.map((e) => Entry.fromJson(e as Map<String, dynamic>)).toList();
   }
 }
-

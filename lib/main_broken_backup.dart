@@ -187,7 +187,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -374,7 +373,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),

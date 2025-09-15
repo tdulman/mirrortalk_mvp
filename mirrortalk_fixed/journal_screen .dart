@@ -11,7 +11,6 @@ import 'record_screen.dart';
 import 'entry_detail_screen.dart';
 import 'settings_screen.dart';
 
-
 enum FilterRange { today, week, month, all }
 
 class JournalScreen extends StatefulWidget {
@@ -50,23 +49,20 @@ class _JournalScreenState extends State<JournalScreen> {
 
     // Streak hesapla
     // 120 günlük pencere: istersen 180 yapabilirsin
-final since = DateTime.now().subtract(const Duration(days: 120));
-final streak = await StreakService.computeHabitTrue(
-  since: since,
-  getDaySummary: StorageService.getDaySummary,
-);
-
+    final since = DateTime.now().subtract(const Duration(days: 120));
+    final streak = await StreakService.computeHabitTrue(
+      since: since,
+      getDaySummary: StorageService.getDaySummary,
+    );
 
     if (!mounted) return;
     setState(() {
-  _all = items;
-  _todaySummary = today;
-  _streak = streak; // habit-true sonuçları
-  _goalsDoneThisWeek = streak.goalsDoneThisWeek; // ekstra döngü yok
-  _loading = false;
-});
-
-
+      _all = items;
+      _todaySummary = today;
+      _streak = streak; // habit-true sonuçları
+      _goalsDoneThisWeek = streak.goalsDoneThisWeek; // ekstra döngü yok
+      _loading = false;
+    });
 
     // Basit kutlama: bugün ilk entry varsa ve henüz kutlamadıysak
     final todayKey = DaySummary.makeDayKey(DateTime.now());
@@ -108,22 +104,21 @@ final streak = await StreakService.computeHabitTrue(
 
     return Scaffold(
       appBar: AppBar(
-  title: const Text("MirrorTalk"),
-  actions: [
-    IconButton(
-      icon: const Icon(Icons.settings),
-      onPressed: () async {
-        final changed = await Navigator.of(context).push<bool>(
-          MaterialPageRoute(builder: (_) => const SettingsScreen()),
-        );
-        if (changed == true) {
-          setState(() {}); // saatler değiştiyse refresh et
-        }
-      },
-    ),
-  ],
-),
-
+        title: const Text("MirrorTalk"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              final changed = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
+              if (changed == true) {
+                setState(() {}); // saatler değiştiyse refresh et
+              }
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -264,8 +259,7 @@ class _EntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtitle =
-        DateFormat('EEE, MMM d • HH:mm').format(entry.createdAt);
+    final subtitle = DateFormat('EEE, MMM d • HH:mm').format(entry.createdAt);
     return Card(
       child: ListTile(
         title: Text(entry.type.name.toUpperCase()),
@@ -348,5 +342,3 @@ class _StatBox extends StatelessWidget {
     );
   }
 }
-
-

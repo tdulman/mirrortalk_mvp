@@ -2,10 +2,10 @@
 import '../models/day_summary.dart';
 
 class StreakInfo {
-  final int current;             // consecutive days ending today if active
-  final int longest;             // best historical streak
-  final int thisWeekDays;        // Mon..Sun active days (habit-true)
-  final int goalsDoneThisWeek;   // # of done==true in this week
+  final int current; // consecutive days ending today if active
+  final int longest; // best historical streak
+  final int thisWeekDays; // Mon..Sun active days (habit-true)
+  final int goalsDoneThisWeek; // # of done==true in this week
 
   const StreakInfo({
     required this.current,
@@ -49,7 +49,8 @@ class StreakService {
       }
 
       // Haftalık goals-done sayımı
-      if (!cursor.isBefore(monday) && !cursor.isAfter(monday.add(const Duration(days: 6)))) {
+      if (!cursor.isBefore(monday) &&
+          !cursor.isAfter(monday.add(const Duration(days: 6)))) {
         goalsDoneThisWeek += ds.done.where((d) => d == true).length;
       }
 

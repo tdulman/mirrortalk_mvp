@@ -41,7 +41,9 @@ class DaySummary {
 
   // ---------- JSON ----------
   factory DaySummary.fromJson(Map<String, dynamic> json) {
-    final dk = (json['dayKey'] ?? json['day'] ?? json['date'] ??
+    final dk = (json['dayKey'] ??
+            json['day'] ??
+            json['date'] ??
             makeDayKey(DateTime.now()))
         .toString();
 
@@ -53,7 +55,11 @@ class DaySummary {
     } else {
       final g1 = json['goal1'], g2 = json['goal2'], g3 = json['goal3'];
       if (g1 != null || g2 != null || g3 != null) {
-        goals = [g1?.toString() ?? '', g2?.toString() ?? '', g3?.toString() ?? ''];
+        goals = [
+          g1?.toString() ?? '',
+          g2?.toString() ?? '',
+          g3?.toString() ?? ''
+        ];
       }
     }
 
@@ -72,6 +78,7 @@ class DaySummary {
           if (x is num) return x != 0;
           return (x?.toString().toLowerCase() == 'true');
         }
+
         done = [cast(d1), cast(d2), cast(d3)];
       }
     }
@@ -100,4 +107,3 @@ class DaySummary {
     return out;
   }
 }
-

@@ -24,10 +24,30 @@ class GoalSuggester {
 
       // Common intent markers / verbs
       final patterns = <String>[
-        'do ', 'finish', 'start', 'complete', 'walk', 'run', 'call',
-        'write', 'read', 'meditate', 'work out', 'gym', 'buy', 'shop',
-        'plan', 'clean', 'wash', 'prepare', 'email', 'study', 'research',
-        'today ', 'tomorrow ', 'now ',
+        'do ',
+        'finish',
+        'start',
+        'complete',
+        'walk',
+        'run',
+        'call',
+        'write',
+        'read',
+        'meditate',
+        'work out',
+        'gym',
+        'buy',
+        'shop',
+        'plan',
+        'clean',
+        'wash',
+        'prepare',
+        'email',
+        'study',
+        'research',
+        'today ',
+        'tomorrow ',
+        'now ',
       ];
 
       final looksLikeGoal = patterns.any((p) => lower.contains(p));
@@ -35,8 +55,8 @@ class GoalSuggester {
         var g = s;
 
         // Strip leading time adverbs
-        g = g.replaceAll(RegExp(r'^(today|tomorrow|now)[:,]?\s*',
-            caseSensitive: false), '');
+        g = g.replaceAll(
+            RegExp(r'^(today|tomorrow|now)[:,]?\s*', caseSensitive: false), '');
 
         if (g.length > 80) g = g.substring(0, 80).trim() + '…';
         candidates.add(_toImperative(g));
@@ -61,8 +81,14 @@ class GoalSuggester {
 
   static String _toImperative(String s) {
     // Rough imperative normalization for EN
-    s = s.replaceAll(RegExp(r'^(i|i will|i should|i need to)\s+', caseSensitive: false), '');
-    s = s.replaceAll(RegExp(r'\b(quickly|maybe|probably|i guess)\b', caseSensitive: false), '').trim();
+    s = s.replaceAll(
+        RegExp(r'^(i|i will|i should|i need to)\s+', caseSensitive: false), '');
+    s = s
+        .replaceAll(
+            RegExp(r'\b(quickly|maybe|probably|i guess)\b',
+                caseSensitive: false),
+            '')
+        .trim();
     return s;
   }
 }

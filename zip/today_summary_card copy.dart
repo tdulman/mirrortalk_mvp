@@ -101,7 +101,6 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-
             _GoalRow(
               label: 'Goal 1',
               controller: _g1,
@@ -122,7 +121,6 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
               value: _summary.done[2],
               onChanged: (v) => _toggle(2, v),
             ),
-
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -130,7 +128,9 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
                 onPressed: _saving ? null : _save,
                 child: _saving
                     ? const SizedBox(
-                        width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2))
                     : const Text('Save'),
               ),
             ),

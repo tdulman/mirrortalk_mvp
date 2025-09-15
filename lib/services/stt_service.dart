@@ -16,25 +16,24 @@ class SttService {
   bool get isListening => _stt.isListening;
 
   Future<bool> start({
-  required void Function(String text) onResult,
-  String localeId = 'en_US',
-}) async {
-  final ok = await initIfNeeded();
-  if (!ok) return false;
+    required void Function(String text) onResult,
+    String localeId = 'en_US',
+  }) async {
+    final ok = await initIfNeeded();
+    if (!ok) return false;
 
-  final started = await _stt.listen(
-    onResult: (res) => onResult(res.recognizedWords),
-    partialResults: true,
-    localeId: localeId,
-    listenMode: stt.ListenMode.confirmation,
-  );
+    final started = await _stt.listen(
+      onResult: (res) => onResult(res.recognizedWords),
+      partialResults: true,
+      localeId: localeId,
+      listenMode: stt.ListenMode.confirmation,
+    );
 
-  // bazı sürümlerde listen() bool dönmez; future<void> da olabilir.
-  // o durumda started null olabilir → true varsayalım:
-  if (started is bool) return started;
-  return true;
-}
-
+    // bazı sürümlerde listen() bool dönmez; future<void> da olabilir.
+    // o durumda started null olabilir → true varsayalım:
+    if (started is bool) return started;
+    return true;
+  }
 
   Future<void> stop() => _stt.stop();
   Future<void> cancel() => _stt.cancel();
