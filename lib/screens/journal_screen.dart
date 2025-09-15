@@ -9,6 +9,8 @@ import '../services/streak_service.dart';
 import 'today_summary_card.dart';
 import 'record_screen.dart';
 import 'entry_detail_screen.dart';
+import 'settings_screen.dart';
+
 
 enum FilterRange { today, week, month, all }
 
@@ -47,32 +49,24 @@ class _JournalScreenState extends State<JournalScreen> {
     final today = await StorageService.getDaySummary(DateTime.now());
 
     // Streak hesapla
-    final streak = StreakService.compute(entries: items);
+    // 120 günlük pencere: istersen 180 yapabilirsin
+final since = DateTime.now().subtract(const Duration(days: 120));
+final streak = await StreakService.computeHabitTrue(
+  since: since,
+  getDaySummary: StorageService.getDaySummary,
+);
 
-    // Haftalık goals done sayısını hesapla (Pazartesi..Pazar)
-    int doneCount = 0;
-    final now = DateTime.now();
-    final monday = now.subtract(Duration(days: (now.weekday - 1)));
-    for (int i = 0; i < 7; i++) {
-      final ds = await StorageService.getDaySummary(
-        DateTime(monday.year, monday.month, monday.day).add(Duration(days: i)),
-      );
-      doneCount += ds.done.where((d) => d == true).length;
-    }
 
     if (!mounted) return;
     setState(() {
-      _all = items;
-      _todaySummary = today;
-      _streak = StreakInfo(
-        current: streak.current,
-        longest: streak.longest,
-        thisWeekDays: streak.thisWeekDays,
-        goalsDoneThisWeek: doneCount,
-      );
-      _goalsDoneThisWeek = doneCount; // (kart içinde de gösteriyoruz)
-      _loading = false;
-    });
+  _all = items;
+  _todaySummary = today;
+  _streak = streak; // habit-true sonuçları
+  _goalsDoneThisWeek = streak.goalsDoneThisWeek; // ekstra döngü yok
+  _loading = false;
+});
+
+
 
     // Basit kutlama: bugün ilk entry varsa ve henüz kutlamadıysak
     final todayKey = DaySummary.makeDayKey(DateTime.now());
@@ -114,14 +108,22 @@ class _JournalScreenState extends State<JournalScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MirrorTalk'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {},
-          ),
-        ],
-      ),
+  title: const Text("MirrorTalk"),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.settings),
+      onPressed: () async {
+        final changed = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(builder: (_) => const SettingsScreen()),
+        );
+        if (changed == true) {
+          setState(() {}); // saatler değiştiyse refresh et
+        }
+      },
+    ),
+  ],
+),
+
       body: SafeArea(
         child: _loading
             ? const Center(child: CircularProgressIndicator())
