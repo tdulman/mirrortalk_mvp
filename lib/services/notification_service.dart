@@ -2,6 +2,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'prefs_service.dart';
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -76,6 +77,39 @@ class NotificationService {
   }
 
   /// (İstersen) yeniden planlamadan önce hepsini silmek için:
+  // ... NotificationService içindeki diğer metodlar ...
+
+  /// (İstersen) yeniden planlamadan önce hepsini silmek için:
   static Future<void> cancelAll() => _plugin.cancelAll();
+} // <<<--- NotificationService BURADA KAPANIYOR
+
+// ====== AŞAĞIDAKİLER TOP-LEVEL (sınıfın DIŞINDA) OLMALI ======
+
+
+// (Kullanılmıyorsa NotificationPlans'ı tamamen silebilirsin)
+class NotificationPlans {
+  final int morningH, morningM;
+  final int eveningH, eveningM;
+  const NotificationPlans(this.morningH, this.morningM, this.eveningH, this.eveningM);
 }
+
+class NotificationPlanner {
+  static Future<void> rescheduleFromPrefs() async {
+    final (mh, mm) = await PrefsService.getMorning();
+    final (eh, em) = await PrefsService.getEvening();
+
+    await NotificationService.cancelAll();
+    await NotificationService.scheduleDaily(
+      id: 100, hour: mh, minute: mm,
+      title: 'Morning focus', body: 'What do you want to accomplish today?',
+    );
+    await NotificationService.scheduleDaily(
+      id: 101, hour: eh, minute: em,
+      title: 'Evening check-in', body: 'What did you get done today?',
+    );
+  }
+}
+
+
+// (İstersen NotificationPlans sınıfını silebilirsin; kullanılmıyor.)
 
