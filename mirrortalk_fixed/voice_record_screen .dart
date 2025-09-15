@@ -1,5 +1,5 @@
+// lib/screens/voice_record_screen.dart
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../services/stt_service.dart';
 
 class VoiceRecordScreen extends StatefulWidget {
@@ -13,64 +13,29 @@ class _VoiceRecordScreenState extends State<VoiceRecordScreen> {
   final _stt = SttService();
   String _text = '';
   bool _starting = false;
-  bool _listening = false;
 
   Future<void> _toggle() async {
-    if (_listening) {
+    if (_stt.isListening) {
       await _stt.stop();
-      setState(() => _listening = false);
+      setState(() {});
       return;
     }
-
     setState(() => _starting = true);
-
-    final mic = await Permission.microphone.request();
-    final speech = await Permission.speech.request();
-
-    if (!mic.isGranted || !speech.isGranted) {
-      setState(() => _starting = false);
-      if (!mounted) return;
-      _showPermissionDialog();
-      return;
-    }
-
     final ok = await _stt.start(
       onResult: (t) => setState(() => _text = t),
       localeId: 'en_US',
     );
-
-    setState(() {
-      _starting = false;
-      _listening = ok;
-    });
-
-    if (!ok && mounted) _showPermissionDialog();
+    setState(() => _starting = false);
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Speech recognition not available')),
+      );
+    }
   }
 
-  void _showPermissionDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Microphone or Speech access needed'),
-        content: const Text(
-          'To convert your voice to text, please allow Microphone and Speech Recognition.\n\n'
-          'You can enable permissions in your device settings.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await openAppSettings();
-            },
-            child: const Text('Open Settings'),
-          ),
-        ],
-      ),
-    );
+  void _useText() {
+    Navigator.of(context).pop(_text.trim());
   }
-
-  void _useText() => Navigator.of(context).pop(_text.trim());
 
   @override
   void dispose() {
@@ -80,6 +45,7 @@ class _VoiceRecordScreenState extends State<VoiceRecordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final listening = _stt.isListening;
     return Scaffold(
       appBar: AppBar(title: const Text('Voice Note')),
       body: Padding(
@@ -94,7 +60,6 @@ class _VoiceRecordScreenState extends State<VoiceRecordScreen> {
                 maxLines: null,
                 decoration: const InputDecoration(
                   labelText: 'Transcript',
-                  hintText: 'Tap the mic and start speaking…',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -104,9 +69,11 @@ class _VoiceRecordScreenState extends State<VoiceRecordScreen> {
               children: [
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: _starting ? null : _toggle,
-                    icon: Icon(_listening ? Icons.stop : Icons.mic),
-                    label: Text(_listening ? 'Stop' : (_starting ? 'Starting…' : 'Start Recording')),
+                    onPressed: _toggle,
+                    icon: Icon(listening ? Icons.stop : Icons.mic),
+                    label: Text(listening
+                        ? 'Stop'
+                        : (_starting ? 'Starting…' : 'Start Recording')),
                   ),
                 ),
                 const SizedBox(width: 8),
