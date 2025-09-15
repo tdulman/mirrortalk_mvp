@@ -51,9 +51,9 @@ class _VoiceRecordScreenState extends State<VoiceRecordScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Microphone or Speech access needed'),
+        title: const Text('Microphone & Speech access needed'),
         content: const Text(
-          'To convert your voice to text, please allow Microphone and Speech Recognition.\n\n'
+          'To turn your voice into text, please allow Microphone and Speech Recognition.\n\n'
           'You can enable permissions in your device settings.',
         ),
         actions: [

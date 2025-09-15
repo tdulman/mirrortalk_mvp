@@ -96,6 +96,7 @@ class _JournalScreenState extends State<JournalScreen> {
         title: const Text('MirrorTalk'),
         actions: [
           IconButton(
+            tooltip: 'Settings',
             icon: const Icon(Icons.settings),
             onPressed: () async {
               final changed = await Navigator.of(context).push<bool>(
@@ -119,7 +120,7 @@ class _JournalScreenState extends State<JournalScreen> {
                         current: _streak!.current,
                         longest: _streak!.longest,
                         thisWeekDays: _streak!.thisWeekDays,
-                        goalsDoneThisWeek: _goalsDoneThisWeek,
+                        goalsDoneThisWeek: _streak!.goalsDoneThisWeek,
                       ),
                       const SizedBox(height: 8),
                     ],
@@ -164,7 +165,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 child: FilledButton.icon(
                   onPressed: _onAddPressed,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add'),
+                  label: const Text('Add Record'),
                 ),
               ),
             ],
@@ -267,6 +268,7 @@ class _EntryTile extends StatelessWidget {
         title: Text(entry.type.name.toUpperCase()),
         subtitle: Text(subtitle),
         trailing: IconButton(
+          tooltip: 'Delete entry', // <— eklendi
           icon: const Icon(Icons.delete_outline),
           onPressed: () async {
             await onDelete();

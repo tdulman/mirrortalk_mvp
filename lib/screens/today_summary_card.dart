@@ -25,7 +25,7 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
     await StorageService.upsertDaySummary(_s);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Saved today's summary")),
+      const SnackBar(content: Text("Today's summary saved")),
     );
     widget.onChanged(_s);
   }
@@ -52,7 +52,8 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              child: FilledButton(onPressed: _save, child: const Text('Save')),
+              child: FilledButton(
+                  onPressed: _save, child: const Text('Save Summary')),
             ),
           ],
         ),
@@ -84,6 +85,7 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
               border: const OutlineInputBorder(),
               isDense: true,
             ),
+            textInputAction: TextInputAction.next,
           ),
         ),
       ],
