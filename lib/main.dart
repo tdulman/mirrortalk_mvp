@@ -1,7 +1,8 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'screens/journal_screen.dart';
-import 'services/notification_service.dart';
+import 'services/notification_service.dart' show NotificationService, NotificationPlanner;
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,6 +10,8 @@ void main() async {
   // Notifications (Phase 5)
   await NotificationService.init();
   await NotificationService.requestPermissions();
+  await NotificationPlanner.rescheduleFromPrefs();
+
 
   // Default reminders
   await NotificationService.scheduleDaily(
