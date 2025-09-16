@@ -1,3 +1,4 @@
+// lib/screens/journal_screen.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -5,22 +6,28 @@ import '../models/day_summary.dart';
 import '../models/entry.dart';
 import '../services/storage_service.dart';
 import '../services/streak_service.dart';
+
 import 'today_summary_card.dart';
 import 'record_screen.dart';
 import 'entry_detail_screen.dart';
 import 'settings_screen.dart';
+import 'onboarding_screen.dart';
+
+import '../services/prefs_service.dart';
 
 enum FilterRange { today, week, month, all }
 
 class JournalScreen extends StatefulWidget {
   const JournalScreen({super.key});
+
   @override
   State<JournalScreen> createState() => _JournalScreenState();
 }
 
 class _JournalScreenState extends State<JournalScreen> {
+  // -------- State --------
   FilterRange _range = FilterRange.today;
-  List<Entry> _all = <Entry>[];
+  final List<Entry> _all = <Entry>[];
   bool _loading = true;
 
   DaySummary? _todaySummary;
@@ -28,21 +35,41 @@ class _JournalScreenState extends State<JournalScreen> {
   int _goalsDoneThisWeek = 0;
   bool _celebratedToday = false;
 
+  // -------- Lifecycle --------
   @override
   void initState() {
     super.initState();
     _load();
+    _maybeShowOnboarding(); // first-run onboarding
   }
 
+  // Show onboarding only on first run, refresh after user completes
+  Future<void> _maybeShowOnboarding() async {
+    final firstRun = await PrefsService.isFirstRun();
+    if (!firstRun) return;
+
+    if (!mounted) return;
+    final done = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+    );
+
+    if (done == true && mounted) {
+      await _reload();
+    }
+  }
+
+  // -------- Data loading --------
   Future<void> _load() async {
     setState(() => _loading = true);
 
+    // load entries
     final items = await StorageService.loadEntries();
     items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
+    // today summary
     final today = await StorageService.getDaySummary(DateTime.now());
 
-    // habit-true streak (last 120 days)
+    // habit-true streak in last 120 days
     final since = DateTime.now().subtract(const Duration(days: 120));
     final streak = await StreakService.computeHabitTrue(
       since: since,
@@ -51,29 +78,36 @@ class _JournalScreenState extends State<JournalScreen> {
 
     if (!mounted) return;
     setState(() {
-      _all = items;
+      _all
+        ..clear()
+        ..addAll(items);
       _todaySummary = today;
       _streak = streak;
       _goalsDoneThisWeek = streak.goalsDoneThisWeek;
       _loading = false;
     });
 
-    // light celebration when first entry is added today
+    // tiny celebration: if there is an entry today and we haven't shown it yet
     final todayKey = DaySummary.makeDayKey(DateTime.now());
-    final todayHadEntry =
+    final todayHasEntry =
         items.any((e) => DaySummary.makeDayKey(e.createdAt) == todayKey);
-    if (todayHadEntry && !_celebratedToday) {
+    if (todayHasEntry && !_celebratedToday) {
       _celebratedToday = true;
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Nice! You're on a habit streak — keep it going 🔥")),
+          content: Text("Nice! You're on a habit streak — keep it going 🔥"),
+        ),
       );
     }
   }
 
   Future<void> _reload() async => _load();
-  List<Entry> _filtered() => _all;
+
+  List<Entry> _filtered() {
+    // (currently no filtering logic other than the chips for Today card)
+    return _all;
+  }
 
   Future<void> _delete(String id) async {
     await StorageService.deleteEntry(id);
@@ -87,6 +121,7 @@ class _JournalScreenState extends State<JournalScreen> {
     if (changed == true) await _reload();
   }
 
+  // -------- UI --------
   @override
   Widget build(BuildContext context) {
     final list = _filtered();
@@ -102,7 +137,9 @@ class _JournalScreenState extends State<JournalScreen> {
               final changed = await Navigator.of(context).push<bool>(
                 MaterialPageRoute(builder: (_) => const SettingsScreen()),
               );
-              if (changed == true) setState(() {});
+              if (changed == true && mounted) {
+                setState(() {}); // refresh if settings affected anything
+              }
             },
           ),
         ],
@@ -204,6 +241,8 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 }
 
+// -------- Helper widgets --------
+
 class _EmptyState extends StatelessWidget {
   final Future<void> Function() onAdd;
   const _EmptyState({required this.onAdd});
@@ -216,24 +255,27 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('No entries yet',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'No entries yet',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             const Text(
               "Tap 'Add' to create your first record. "
               "You can speak a quick voice note and we'll suggest goals instantly.",
             ),
             const SizedBox(height: 12),
-            Row(
+            const Row(
               children: [
                 Icon(Icons.lightbulb_outline, size: 18),
                 SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                      'Tip: marking at least one goal as Done counts toward your streak.'),
+                    'Tip: marking at least one goal as Done counts toward your streak.',
+                  ),
                 ),
               ],
             ),
@@ -257,8 +299,11 @@ class _EntryTile extends StatelessWidget {
   final Future<void> Function() onDelete;
   final Future<void> Function() onChanged;
 
-  const _EntryTile(
-      {required this.entry, required this.onDelete, required this.onChanged});
+  const _EntryTile({
+    required this.entry,
+    required this.onDelete,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +313,7 @@ class _EntryTile extends StatelessWidget {
         title: Text(entry.type.name.toUpperCase()),
         subtitle: Text(subtitle),
         trailing: IconButton(
-          tooltip: 'Delete entry', // <— eklendi
+          tooltip: 'Delete entry',
           icon: const Icon(Icons.delete_outline),
           onPressed: () async {
             await onDelete();
@@ -301,6 +346,7 @@ class _StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -312,8 +358,7 @@ class _StreakCard extends StatelessWidget {
             const SizedBox(width: 12),
             _StatBox(title: 'Active days', value: '${thisWeekDays ?? 0}/wk'),
             const SizedBox(width: 12),
-            _StatBox(
-                title: 'Goals done', value: '${goalsDoneThisWeek ?? 0}/wk'),
+            _StatBox(title: 'Goals done', value: '${goalsDoneThisWeek ?? 0}/wk'),
           ],
         ),
       ),
@@ -324,6 +369,7 @@ class _StreakCard extends StatelessWidget {
 class _StatBox extends StatelessWidget {
   final String title;
   final String value;
+
   const _StatBox({required this.title, required this.value});
 
   @override
