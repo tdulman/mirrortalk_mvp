@@ -1,6 +1,8 @@
 // lib/screens/settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 import '../services/prefs_service.dart';
 import '../services/notification_service.dart'
@@ -161,6 +163,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
 
+          // ===== Feedback & About =====
+const SizedBox(height: 24),
+const Text(
+  'Feedback & About',
+  style: TextStyle(fontWeight: FontWeight.w600),
+),
+ListTile(
+  leading: const Icon(Icons.mail_outline),
+  title: const Text('Send feedback'),
+  subtitle: const Text('Tell us what to improve'),
+  onTap: () async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: 'feedback@mirrortalk.app',
+      queryParameters: {
+        'subject': 'MirrorTalk feedback',
+        'body': 'What is working well? What should we improve?\n\n(Your notes here)',
+      },
+    );
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  },
+),
+ListTile(
+  leading: const Icon(Icons.info_outline),
+  title: const Text('About MirrorTalk'),
+  subtitle: const Text('Version 0.1.0 • Early preview'),
+  onTap: () {
+    showAboutDialog(
+      context: context,
+      applicationName: 'MirrorTalk',
+      applicationVersion: '0.1.0',
+      children: const [
+        Text("Record your self-talk, turn it into goals, and build streaks."),
+      ],
+    );
+  },
+),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,

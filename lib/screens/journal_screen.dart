@@ -12,7 +12,7 @@ import 'record_screen.dart';
 import 'entry_detail_screen.dart';
 import 'settings_screen.dart';
 import 'onboarding_screen.dart';
-
+import 'package:flutter/services.dart'; // for HapticFeedback
 import '../services/prefs_service.dart';
 
 enum FilterRange { today, week, month, all }
@@ -305,6 +305,28 @@ class _EntryTile extends StatelessWidget {
     required this.onChanged,
   });
 
+  Future<void> _confirmDelete(BuildContext context) async {
+    HapticFeedback.selectionClick();
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete entry?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (yes == true) {
+      await onDelete();
+      HapticFeedback.lightImpact();
+      await onChanged();
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Entry deleted')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final subtitle = DateFormat('EEE, MMM d • HH:mm').format(entry.createdAt);
@@ -315,12 +337,10 @@ class _EntryTile extends StatelessWidget {
         trailing: IconButton(
           tooltip: 'Delete entry',
           icon: const Icon(Icons.delete_outline),
-          onPressed: () async {
-            await onDelete();
-            await onChanged();
-          },
+          onPressed: () => _confirmDelete(context),
         ),
         onTap: () async {
+          HapticFeedback.selectionClick();
           await Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => EntryDetailScreen(entry: entry)),
           );
@@ -330,6 +350,7 @@ class _EntryTile extends StatelessWidget {
     );
   }
 }
+
 
 class _StreakCard extends StatelessWidget {
   final int? current;
