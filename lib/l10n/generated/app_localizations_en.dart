@@ -57,6 +57,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todaysIntention => 'Today\'s intention';
 
   @override
+  String get summaryCardTitle => 'Three small commitments';
+
+  @override
+  String get goalHintRead => 'Read 20 pages';
+
+  @override
+  String get goalHintEmail => 'Send one important email';
+
+  @override
+  String get goalHintWalk => 'Take a 15-minute walk';
+
+  @override
+  String get saveIntention => 'Save intention';
+
+  @override
+  String get intentionSaved => 'Intention saved';
+
+  @override
   String get recentReflections => 'Recent reflections';
 
   @override

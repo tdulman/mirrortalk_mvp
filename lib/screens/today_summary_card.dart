@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // HapticFeedback
+import '../l10n/generated/app_localizations.dart';
 import '../models/day_summary.dart';
 import '../services/storage_service.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 
 class TodaySummaryCard extends StatefulWidget {
   final DaySummary summary;
@@ -75,39 +78,49 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
   Future<void> _save() async {
     await StorageService.upsertDaySummary(_s);
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Today's summary saved")),
+      SnackBar(content: Text(l10n.intentionSaved)),
     );
     widget.onChanged(_s);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Today's Summary",
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w600),
+              l10n.summaryCardTitle,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            const SizedBox(height: 12),
-            _goalRow(0, hint: 'e.g., Read 20 pages of a book'),
-            const SizedBox(height: 8),
-            _goalRow(1, hint: 'e.g., Send 1 important email'),
-            const SizedBox(height: 8),
-            _goalRow(2, hint: 'e.g., Take a 15-min walk'),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm),
+            _goalRow(0, hint: l10n.goalHintRead),
+            const SizedBox(height: AppSpacing.xxs),
+            _goalRow(1, hint: l10n.goalHintEmail),
+            const SizedBox(height: AppSpacing.xxs),
+            _goalRow(2, hint: l10n.goalHintWalk),
+            const SizedBox(height: AppSpacing.sm),
             SizedBox(
               width: double.infinity,
-              child: FilledButton(
+              height: 44,
+              child: OutlinedButton(
                 onPressed: _save,
-                child: const Text('Save Summary'),
+                style: OutlinedButton.styleFrom(
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                child: Text(l10n.saveIntention),
               ),
             ),
           ],
@@ -123,11 +136,14 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
       children: [
         Checkbox(
           value: done,
+          visualDensity: VisualDensity.compact,
           onChanged: (v) => _toggleDone(i, v ?? false),
         ),
+        const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: TextField(
             controller: _controllers[i],
+            style: Theme.of(context).textTheme.bodyMedium,
             onChanged: (v) {
               setState(() {
                 while (_s.goals.length <= i) {
@@ -140,8 +156,15 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
             },
             decoration: InputDecoration(
               hintText: hint,
-              border: const OutlineInputBorder(),
               isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              hintStyle: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: AppColors.inkMuted),
             ),
             textInputAction: TextInputAction.next,
           ),

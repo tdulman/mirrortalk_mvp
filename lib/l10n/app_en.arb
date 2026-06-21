@@ -60,6 +60,30 @@
   "@todaysIntention": {
     "description": "Section label for today's goals and done states."
   },
+  "summaryCardTitle": "Three small commitments",
+  "@summaryCardTitle": {
+    "description": "Title inside the Today Summary card."
+  },
+  "goalHintRead": "Read 20 pages",
+  "@goalHintRead": {
+    "description": "Example goal hint for the first commitment input."
+  },
+  "goalHintEmail": "Send one important email",
+  "@goalHintEmail": {
+    "description": "Example goal hint for the second commitment input."
+  },
+  "goalHintWalk": "Take a 15-minute walk",
+  "@goalHintWalk": {
+    "description": "Example goal hint for the third commitment input."
+  },
+  "saveIntention": "Save intention",
+  "@saveIntention": {
+    "description": "Button label to save today's intentions."
+  },
+  "intentionSaved": "Intention saved",
+  "@intentionSaved": {
+    "description": "Snackbar text after saving today's intentions."
+  },
   "recentReflections": "Recent reflections",
   "@recentReflections": {
     "description": "Section title for the user's recent entries."

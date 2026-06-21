@@ -184,6 +184,42 @@ abstract class AppLocalizations {
   /// **'Today\'s intention'**
   String get todaysIntention;
 
+  /// Title inside the Today Summary card.
+  ///
+  /// In en, this message translates to:
+  /// **'Three small commitments'**
+  String get summaryCardTitle;
+
+  /// Example goal hint for the first commitment input.
+  ///
+  /// In en, this message translates to:
+  /// **'Read 20 pages'**
+  String get goalHintRead;
+
+  /// Example goal hint for the second commitment input.
+  ///
+  /// In en, this message translates to:
+  /// **'Send one important email'**
+  String get goalHintEmail;
+
+  /// Example goal hint for the third commitment input.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a 15-minute walk'**
+  String get goalHintWalk;
+
+  /// Button label to save today's intentions.
+  ///
+  /// In en, this message translates to:
+  /// **'Save intention'**
+  String get saveIntention;
+
+  /// Snackbar text after saving today's intentions.
+  ///
+  /// In en, this message translates to:
+  /// **'Intention saved'**
+  String get intentionSaved;
+
   /// Section title for the user's recent entries.
   ///
   /// In en, this message translates to:

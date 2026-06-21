@@ -155,16 +155,16 @@ class _JournalScreenState extends State<JournalScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.lg,
-                    AppSpacing.sm,
+                    AppSpacing.xs,
                     AppSpacing.lg,
-                    112,
+                    AppSpacing.xl,
                   ),
                   children: [
                     _RitualCard(
                       ritual: ritual,
                       onStart: _onAddPressed,
                     ),
-                    const SizedBox(height: AppSpacing.xl),
+                    const SizedBox(height: AppSpacing.lg),
                     Text(
                       l10n.todaysIntention,
                       style: Theme.of(context)
@@ -181,7 +181,7 @@ class _JournalScreenState extends State<JournalScreen> {
                       ),
                     ],
                     if (_streak != null) ...[
-                      const SizedBox(height: AppSpacing.xl),
+                      const SizedBox(height: AppSpacing.lg),
                       _StreakCard(
                         current: _streak!.current,
                         longest: _streak!.longest,
@@ -189,7 +189,7 @@ class _JournalScreenState extends State<JournalScreen> {
                         goalsDoneThisWeek: _streak!.goalsDoneThisWeek,
                       ),
                     ],
-                    const SizedBox(height: AppSpacing.xl),
+                    const SizedBox(height: AppSpacing.lg),
                     Row(
                       children: [
                         Expanded(
@@ -229,22 +229,6 @@ class _JournalScreenState extends State<JournalScreen> {
                   ],
                 ),
               ),
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: _onAddPressed,
-                  icon: const Icon(Icons.videocam_outlined),
-                  label: Text(l10n.startMirrorTalk),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -332,7 +316,7 @@ class _RitualCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
@@ -348,12 +332,13 @@ class _RitualCard extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             ritual.title,
             style: textTheme.headlineSmall?.copyWith(
               color: AppColors.ink,
               fontWeight: FontWeight.w700,
+              fontSize: 28,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -361,16 +346,16 @@ class _RitualCard extends StatelessWidget {
             ritual.prompt,
             style: textTheme.bodyLarge?.copyWith(
               color: AppColors.inkMuted,
-              height: 1.35,
+              height: 1.3,
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.md),
           FilledButton.icon(
             onPressed: onStart,
             icon: const Icon(Icons.videocam_outlined),
             label: Text(l10n.startMirrorTalk),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.xxs),
           Text(
             l10n.oneMinuteEnough,
             style: textTheme.bodySmall?.copyWith(color: AppColors.inkMuted),
@@ -508,7 +493,10 @@ class _StreakCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceMuted.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(8),
