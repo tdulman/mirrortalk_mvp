@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 
 import '../models/entry.dart';
-import '../models/day_summary.dart';
 import '../services/storage_service.dart';
 import '../services/goal_suggester.dart';
 import 'voice_record_screen.dart';

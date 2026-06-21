@@ -1,18 +1,21 @@
 // lib/screens/journal_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/generated/app_localizations.dart';
 import '../models/day_summary.dart';
 import '../models/entry.dart';
 import '../services/storage_service.dart';
 import '../services/streak_service.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 
 import 'today_summary_card.dart';
 import 'record_screen.dart';
 import 'entry_detail_screen.dart';
 import 'settings_screen.dart';
 import 'onboarding_screen.dart';
-import 'package:flutter/services.dart'; // for HapticFeedback
 import '../services/prefs_service.dart';
 
 enum FilterRange { today, week, month, all }
@@ -32,7 +35,6 @@ class _JournalScreenState extends State<JournalScreen> {
 
   DaySummary? _todaySummary;
   StreakInfo? _streak;
-  int _goalsDoneThisWeek = 0;
   bool _celebratedToday = false;
 
   // -------- Lifecycle --------
@@ -83,7 +85,6 @@ class _JournalScreenState extends State<JournalScreen> {
         ..addAll(items);
       _todaySummary = today;
       _streak = streak;
-      _goalsDoneThisWeek = streak.goalsDoneThisWeek;
       _loading = false;
     });
 
@@ -125,13 +126,15 @@ class _JournalScreenState extends State<JournalScreen> {
   @override
   Widget build(BuildContext context) {
     final list = _filtered();
+    final l10n = AppLocalizations.of(context);
+    final ritual = _RitualMoment.now(l10n);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MirrorTalk'),
+        title: Text(l10n.appTitle),
         actions: [
           IconButton(
-            tooltip: 'Settings',
+            tooltip: l10n.settingsTooltip,
             icon: const Icon(Icons.settings),
             onPressed: () async {
               final changed = await Navigator.of(context).push<bool>(
@@ -150,25 +153,59 @@ class _JournalScreenState extends State<JournalScreen> {
             : RefreshIndicator(
                 onRefresh: _reload,
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    112,
+                  ),
                   children: [
+                    _RitualCard(
+                      ritual: ritual,
+                      onStart: _onAddPressed,
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      l10n.todaysIntention,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    if (_range == FilterRange.today) ...[
+                      TodaySummaryCard(
+                        summary: _todaySummary ??
+                            DaySummary.emptyFor(DateTime.now()),
+                        onChanged: (s) => setState(() => _todaySummary = s),
+                      ),
+                    ],
                     if (_streak != null) ...[
+                      const SizedBox(height: AppSpacing.xl),
                       _StreakCard(
                         current: _streak!.current,
                         longest: _streak!.longest,
                         thisWeekDays: _streak!.thisWeekDays,
                         goalsDoneThisWeek: _streak!.goalsDoneThisWeek,
                       ),
-                      const SizedBox(height: 8),
                     ],
-                    _filterChips(),
-                    const SizedBox(height: 8),
-                    if (_range == FilterRange.today)
-                      TodaySummaryCard(
-                        summary: _todaySummary ??
-                            DaySummary.emptyFor(DateTime.now()),
-                        onChanged: (s) => setState(() => _todaySummary = s),
-                      ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.recentReflections,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    _filterChips(l10n),
+                    const SizedBox(height: AppSpacing.xs),
                     if (list.isEmpty)
                       _EmptyState(onAdd: _onAddPressed)
                     else ...[
@@ -201,8 +238,8 @@ class _JournalScreenState extends State<JournalScreen> {
               Expanded(
                 child: FilledButton.icon(
                   onPressed: _onAddPressed,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Record'),
+                  icon: const Icon(Icons.videocam_outlined),
+                  label: Text(l10n.startMirrorTalk),
                 ),
               ),
             ],
@@ -212,27 +249,27 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _filterChips() {
+  Widget _filterChips(AppLocalizations l10n) {
     return Wrap(
       spacing: 8,
       children: [
         ChoiceChip(
-          label: const Text('Today'),
+          label: Text(l10n.filterToday),
           selected: _range == FilterRange.today,
           onSelected: (_) => setState(() => _range = FilterRange.today),
         ),
         ChoiceChip(
-          label: const Text('Week'),
+          label: Text(l10n.filterWeek),
           selected: _range == FilterRange.week,
           onSelected: (_) => setState(() => _range = FilterRange.week),
         ),
         ChoiceChip(
-          label: const Text('Month'),
+          label: Text(l10n.filterMonth),
           selected: _range == FilterRange.month,
           onSelected: (_) => setState(() => _range = FilterRange.month),
         ),
         ChoiceChip(
-          label: const Text('All'),
+          label: Text(l10n.filterAll),
           selected: _range == FilterRange.all,
           onSelected: (_) => setState(() => _range = FilterRange.all),
         ),
@@ -243,52 +280,150 @@ class _JournalScreenState extends State<JournalScreen> {
 
 // -------- Helper widgets --------
 
+class _RitualMoment {
+  final String eyebrow;
+  final String title;
+  final String prompt;
+
+  const _RitualMoment({
+    required this.eyebrow,
+    required this.title,
+    required this.prompt,
+  });
+
+  factory _RitualMoment.now(AppLocalizations l10n) {
+    final now = DateTime.now();
+    if (now.weekday == DateTime.sunday && now.hour >= 12) {
+      return _RitualMoment(
+        eyebrow: l10n.todaySectionTitle,
+        title: l10n.weeklyRitualTitle,
+        prompt: l10n.weeklyRitualPrompt,
+      );
+    }
+
+    if (now.hour < 15) {
+      return _RitualMoment(
+        eyebrow: l10n.todaySectionTitle,
+        title: l10n.morningRitualTitle,
+        prompt: l10n.morningRitualPrompt,
+      );
+    }
+
+    return _RitualMoment(
+      eyebrow: l10n.todaySectionTitle,
+      title: l10n.eveningRitualTitle,
+      prompt: l10n.eveningRitualPrompt,
+    );
+  }
+}
+
+class _RitualCard extends StatelessWidget {
+  final _RitualMoment ritual;
+  final Future<void> Function() onStart;
+
+  const _RitualCard({
+    required this.ritual,
+    required this.onStart,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            ritual.eyebrow.toUpperCase(),
+            style: textTheme.labelMedium?.copyWith(
+              color: AppColors.inkMuted,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            ritual.title,
+            style: textTheme.headlineSmall?.copyWith(
+              color: AppColors.ink,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            ritual.prompt,
+            style: textTheme.bodyLarge?.copyWith(
+              color: AppColors.inkMuted,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          FilledButton.icon(
+            onPressed: onStart,
+            icon: const Icon(Icons.videocam_outlined),
+            label: Text(l10n.startMirrorTalk),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            l10n.oneMinuteEnough,
+            style: textTheme.bodySmall?.copyWith(color: AppColors.inkMuted),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _EmptyState extends StatelessWidget {
   final Future<void> Function() onAdd;
   const _EmptyState({required this.onAdd});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'No entries yet',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w600),
+    final l10n = AppLocalizations.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.noReflectionsYet,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            l10n.firstReflectionHint,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: AppColors.inkMuted),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.icon(
+              onPressed: onAdd,
+              icon: const Icon(Icons.videocam_outlined),
+              label: Text(l10n.startMirrorTalk),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              "Tap 'Add' to create your first record. "
-              "You can speak a quick voice note and we'll suggest goals instantly.",
-            ),
-            const SizedBox(height: 12),
-            const Row(
-              children: [
-                Icon(Icons.lightbulb_outline, size: 18),
-                SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    'Tip: marking at least one goal as Done counts toward your streak.',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton(
-                onPressed: onAdd,
-                child: const Text('Add your first record'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -313,8 +448,12 @@ class _EntryTile extends StatelessWidget {
         title: const Text('Delete entry?'),
         content: const Text('This action cannot be undone.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete')),
         ],
       ),
     );
@@ -323,7 +462,8 @@ class _EntryTile extends StatelessWidget {
       HapticFeedback.lightImpact();
       await onChanged();
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Entry deleted')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Entry deleted')));
     }
   }
 
@@ -351,7 +491,6 @@ class _EntryTile extends StatelessWidget {
   }
 }
 
-
 class _StreakCard extends StatelessWidget {
   final int? current;
   final int? longest;
@@ -367,21 +506,24 @@ class _StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            _StatBox(title: 'Streak', value: (current ?? 0).toString()),
-            const SizedBox(width: 12),
-            _StatBox(title: 'Best', value: (longest ?? 0).toString()),
-            const SizedBox(width: 12),
-            _StatBox(title: 'Active days', value: '${thisWeekDays ?? 0}/wk'),
-            const SizedBox(width: 12),
-            _StatBox(title: 'Goals done', value: '${goalsDoneThisWeek ?? 0}/wk'),
-          ],
-        ),
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          _StatBox(title: l10n.showingUp, value: '${current ?? 0}d'),
+          const SizedBox(width: AppSpacing.xs),
+          _StatBox(title: l10n.bestRun, value: '${longest ?? 0}d'),
+          const SizedBox(width: AppSpacing.xs),
+          _StatBox(title: l10n.thisWeek, value: '${thisWeekDays ?? 0}/7'),
+          const SizedBox(width: AppSpacing.xs),
+          _StatBox(title: l10n.goalsDone, value: '${goalsDoneThisWeek ?? 0}'),
+        ],
       ),
     );
   }
@@ -397,19 +539,24 @@ class _StatBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.black12),
-        ),
-        child: Column(
-          children: [
-            Text(value, style: t.titleMedium),
-            const SizedBox(height: 4),
-            Text(title, style: t.labelMedium?.copyWith(color: Colors.black54)),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            style: t.titleMedium?.copyWith(
+              color: AppColors.ink,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: t.labelSmall?.copyWith(color: AppColors.inkMuted),
+          ),
+        ],
       ),
     );
   }

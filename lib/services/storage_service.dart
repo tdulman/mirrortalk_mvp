@@ -24,7 +24,7 @@ class StorageService {
     }
   }
 
-  static Future<void> _saveAll(List<Entry> items) async {
+  static Future<void> saveAll(List<Entry> items) async {
     final f = await _entriesFile();
     await f.writeAsString(Entry.encodeList(items));
   }
@@ -32,13 +32,13 @@ class StorageService {
   static Future<void> appendEntry(Entry e) async {
     final items = await loadEntries();
     items.add(e);
-    await _saveAll(items);
+    await saveAll(items);
   }
 
   static Future<void> deleteEntry(String id) async {
     final items = await loadEntries();
     items.removeWhere((e) => e.id == id);
-    await _saveAll(items);
+    await saveAll(items);
   }
 
   // ---- DaySummary ----

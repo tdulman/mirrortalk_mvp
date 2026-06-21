@@ -22,11 +22,15 @@ class SttService {
     final ok = await initIfNeeded();
     if (!ok) return false;
 
+    final options = stt.SpeechListenOptions(
+      partialResults: true,
+      listenMode: stt.ListenMode.confirmation,
+    );
+
     final started = await _stt.listen(
       onResult: (res) => onResult(res.recognizedWords),
-      partialResults: true,
       localeId: localeId,
-      listenMode: stt.ListenMode.confirmation,
+      listenOptions: options,
     );
 
     // bazı sürümlerde listen() bool dönmez; future<void> da olabilir.

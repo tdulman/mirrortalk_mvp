@@ -96,14 +96,18 @@ class DaySummary {
   static List<String> _normGoals(List<String>? input) {
     final out = <String>[];
     if (input != null) out.addAll(input.take(3));
-    while (out.length < 3) out.add('');
+    while (out.length < 3) {
+      out.add('');
+    }
     return out;
   }
 
   static List<bool> _normDone(List<bool>? input) {
     final out = <bool>[];
     if (input != null) out.addAll(input.take(3));
-    while (out.length < 3) out.add(false);
+    while (out.length < 3) {
+      out.add(false);
+    }
     return out;
   }
 }

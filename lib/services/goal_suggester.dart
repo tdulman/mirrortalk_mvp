@@ -58,7 +58,7 @@ class GoalSuggester {
         g = g.replaceAll(
             RegExp(r'^(today|tomorrow|now)[:,]?\s*', caseSensitive: false), '');
 
-        if (g.length > 80) g = g.substring(0, 80).trim() + '…';
+        if (g.length > 80) g = '${g.substring(0, 80).trim()}…';
         candidates.add(_toImperative(g));
       }
     }

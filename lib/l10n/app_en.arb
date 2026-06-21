@@ -1,0 +1,111 @@
+{
+  "@@locale": "en",
+  "appTitle": "MirrorTalk",
+  "@appTitle": {
+    "description": "The product name shown in app chrome and metadata."
+  },
+  "morningReminderTitle": "Morning focus",
+  "@morningReminderTitle": {
+    "description": "Daily morning reminder notification title."
+  },
+  "morningReminderBody": "What do you want to accomplish today?",
+  "@morningReminderBody": {
+    "description": "Daily morning reminder notification body."
+  },
+  "eveningReminderTitle": "Evening check-in",
+  "@eveningReminderTitle": {
+    "description": "Daily evening reminder notification title."
+  },
+  "eveningReminderBody": "What did you get done today?",
+  "@eveningReminderBody": {
+    "description": "Daily evening reminder notification body."
+  },
+  "todaySectionTitle": "Today",
+  "@todaySectionTitle": {
+    "description": "Main Today section title on the home screen."
+  },
+  "morningRitualTitle": "Morning mirror",
+  "@morningRitualTitle": {
+    "description": "Title for the morning self-talk ritual."
+  },
+  "morningRitualPrompt": "What will you do today, and why does it matter?",
+  "@morningRitualPrompt": {
+    "description": "Prompt shown before a morning self-talk record."
+  },
+  "eveningRitualTitle": "Evening check-in",
+  "@eveningRitualTitle": {
+    "description": "Title for the evening self-talk ritual."
+  },
+  "eveningRitualPrompt": "What happened today, and what can tomorrow learn from it?",
+  "@eveningRitualPrompt": {
+    "description": "Prompt shown before an evening self-talk record."
+  },
+  "weeklyRitualTitle": "Weekly rewind",
+  "@weeklyRitualTitle": {
+    "description": "Title for the weekly review ritual."
+  },
+  "weeklyRitualPrompt": "Look back gently. What pattern is worth carrying into next week?",
+  "@weeklyRitualPrompt": {
+    "description": "Prompt shown for the weekly review ritual."
+  },
+  "startMirrorTalk": "Start Mirror Talk",
+  "@startMirrorTalk": {
+    "description": "Primary action to begin a self-talk record."
+  },
+  "oneMinuteEnough": "One honest minute is enough.",
+  "@oneMinuteEnough": {
+    "description": "Supportive helper copy under the primary ritual action."
+  },
+  "todaysIntention": "Today's intention",
+  "@todaysIntention": {
+    "description": "Section label for today's goals and done states."
+  },
+  "recentReflections": "Recent reflections",
+  "@recentReflections": {
+    "description": "Section title for the user's recent entries."
+  },
+  "noReflectionsYet": "No reflections yet",
+  "@noReflectionsYet": {
+    "description": "Empty state title when there are no journal entries."
+  },
+  "firstReflectionHint": "Start with one short mirror talk. Speak naturally; this is only for you.",
+  "@firstReflectionHint": {
+    "description": "Empty state helper text for the first reflection."
+  },
+  "showingUp": "Showing up",
+  "@showingUp": {
+    "description": "Label for current streak in the calm progress strip."
+  },
+  "bestRun": "Best run",
+  "@bestRun": {
+    "description": "Label for best streak."
+  },
+  "thisWeek": "This week",
+  "@thisWeek": {
+    "description": "Label for weekly active days."
+  },
+  "goalsDone": "Goals done",
+  "@goalsDone": {
+    "description": "Label for weekly completed goals."
+  },
+  "settingsTooltip": "Settings",
+  "@settingsTooltip": {
+    "description": "Tooltip for the settings button."
+  },
+  "filterToday": "Today",
+  "@filterToday": {
+    "description": "Today journal filter label."
+  },
+  "filterWeek": "Week",
+  "@filterWeek": {
+    "description": "Week journal filter label."
+  },
+  "filterMonth": "Month",
+  "@filterMonth": {
+    "description": "Month journal filter label."
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "All journal filter label."
+  }
+}

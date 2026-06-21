@@ -12,7 +12,7 @@ analyzer:
   exclude:
     - mirrortalk_fixed/**
     - zip/**
-    - **/* copy.dart
+    - "**/* copy.dart"
 
 
 linter:

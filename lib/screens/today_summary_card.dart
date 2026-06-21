@@ -61,7 +61,9 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
   // === Toggle helper (hafif titreşim dahil) ===
   void _toggleDone(int index, bool value) {
     setState(() {
-      while (_s.done.length <= index) _s.done.add(false);
+      while (_s.done.length <= index) {
+        _s.done.add(false);
+      }
       _s.done[index] = value;
     });
     HapticFeedback.lightImpact();
@@ -128,7 +130,9 @@ class _TodaySummaryCardState extends State<TodaySummaryCard> {
             controller: _controllers[i],
             onChanged: (v) {
               setState(() {
-                while (_s.goals.length <= i) _s.goals.add('');
+                while (_s.goals.length <= i) {
+                  _s.goals.add('');
+                }
                 _s.goals[i] = v;
               });
               // Değişikliği yukarıya ANINDA iletmek istersen aç:

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/entry.dart';
 import 'storage_service.dart';
 
 class RetentionService {

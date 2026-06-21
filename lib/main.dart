@@ -1,8 +1,11 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
+import 'l10n/generated/app_localizations.dart';
+import 'l10n/generated/app_localizations_en.dart';
 import 'screens/journal_screen.dart';
 import 'services/notification_service.dart'
     show NotificationService, NotificationPlanner;
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,11 +40,10 @@ class MirrorTalkApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MirrorTalk',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: const Color(0xFF224231),
-      ),
+      title: AppLocalizationsEn().appTitle,
+      theme: AppTheme.light,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const JournalScreen(),
     );
   }

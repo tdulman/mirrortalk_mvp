@@ -4,6 +4,8 @@ import 'dart:convert';
 enum RecordType { morning, evening }
 
 class Entry {
+  static const Object _unset = Object();
+
   final String id;
   final RecordType type;
   final DateTime createdAt;
@@ -21,6 +23,27 @@ class Entry {
     List<String>? tags,
     this.videoPath,
   }) : tags = List<String>.from(tags ?? const []);
+
+  Entry copyWith({
+    String? id,
+    RecordType? type,
+    DateTime? createdAt,
+    int? durationSec,
+    Object? transcript = _unset,
+    List<String>? tags,
+    Object? videoPath = _unset,
+  }) {
+    return Entry(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      createdAt: createdAt ?? this.createdAt,
+      durationSec: durationSec ?? this.durationSec,
+      transcript:
+          transcript == _unset ? this.transcript : transcript as String?,
+      tags: tags ?? this.tags,
+      videoPath: videoPath == _unset ? this.videoPath : videoPath as String?,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
