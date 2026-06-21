@@ -184,6 +184,26 @@
   "@mirrorTalkSaveReflection": {
     "description": "Button label to save a recorded mirror talk."
   },
+  "mirrorTalkReviewTitle": "Review your reflection",
+  "@mirrorTalkReviewTitle": {
+    "description": "Title shown after a video recording is complete."
+  },
+  "mirrorTalkReviewPrompt": "Keep what matters. The video can fade later; the reflection stays.",
+  "@mirrorTalkReviewPrompt": {
+    "description": "Supporting text on the video review screen."
+  },
+  "mirrorTalkTapToPlay": "Tap to play",
+  "@mirrorTalkTapToPlay": {
+    "description": "Hint shown on a saved video preview."
+  },
+  "mirrorTalkRecordingHint": "Look at yourself, say one honest thing, then stop.",
+  "@mirrorTalkRecordingHint": {
+    "description": "Short instruction shown on the live recording screen."
+  },
+  "mirrorTalkVideoKeptSevenDays": "Video stays on this device for 7 days.",
+  "@mirrorTalkVideoKeptSevenDays": {
+    "description": "Privacy and retention helper text on the review screen."
+  },
   "mirrorTalkTranscriptLabel": "Reflection note",
   "@mirrorTalkTranscriptLabel": {
     "description": "Label for optional reflection transcript/note field."

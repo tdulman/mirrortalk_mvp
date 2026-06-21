@@ -153,6 +153,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mirrorTalkSaveReflection => 'Save reflection';
 
   @override
+  String get mirrorTalkReviewTitle => 'Review your reflection';
+
+  @override
+  String get mirrorTalkReviewPrompt =>
+      'Keep what matters. The video can fade later; the reflection stays.';
+
+  @override
+  String get mirrorTalkTapToPlay => 'Tap to play';
+
+  @override
+  String get mirrorTalkRecordingHint =>
+      'Look at yourself, say one honest thing, then stop.';
+
+  @override
+  String get mirrorTalkVideoKeptSevenDays =>
+      'Video stays on this device for 7 days.';
+
+  @override
   String get mirrorTalkTranscriptLabel => 'Reflection note';
 
   @override

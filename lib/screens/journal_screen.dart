@@ -455,10 +455,23 @@ class _EntryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subtitle = DateFormat('EEE, MMM d • HH:mm').format(entry.createdAt);
+    final hasVideo = entry.videoPath != null && entry.videoPath!.isNotEmpty;
+    final hasNote = entry.transcript != null && entry.transcript!.isNotEmpty;
     return Card(
       child: ListTile(
-        title: Text(entry.type.name.toUpperCase()),
-        subtitle: Text(subtitle),
+        leading: Icon(
+          hasVideo ? Icons.play_circle_outline : Icons.notes_outlined,
+          color: AppColors.primary,
+        ),
+        title: Text(
+          entry.type.name.toUpperCase(),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        subtitle: Text(
+          hasNote ? '${entry.transcript}\n$subtitle' : subtitle,
+          maxLines: hasNote ? 3 : 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         trailing: IconButton(
           tooltip: 'Delete entry',
           icon: const Icon(Icons.delete_outline),

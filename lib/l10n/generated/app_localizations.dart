@@ -370,6 +370,36 @@ abstract class AppLocalizations {
   /// **'Save reflection'**
   String get mirrorTalkSaveReflection;
 
+  /// Title shown after a video recording is complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your reflection'**
+  String get mirrorTalkReviewTitle;
+
+  /// Supporting text on the video review screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep what matters. The video can fade later; the reflection stays.'**
+  String get mirrorTalkReviewPrompt;
+
+  /// Hint shown on a saved video preview.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to play'**
+  String get mirrorTalkTapToPlay;
+
+  /// Short instruction shown on the live recording screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Look at yourself, say one honest thing, then stop.'**
+  String get mirrorTalkRecordingHint;
+
+  /// Privacy and retention helper text on the review screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Video stays on this device for 7 days.'**
+  String get mirrorTalkVideoKeptSevenDays;
+
   /// Label for optional reflection transcript/note field.
   ///
   /// In en, this message translates to:
