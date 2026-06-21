@@ -5,10 +5,13 @@ import 'l10n/generated/app_localizations_en.dart';
 import 'screens/journal_screen.dart';
 import 'services/notification_service.dart'
     show NotificationService, NotificationPlanner;
+import 'services/retention_service.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await RetentionService.enforce();
 
   // Notifications (Phase 5)
   await NotificationService.init();

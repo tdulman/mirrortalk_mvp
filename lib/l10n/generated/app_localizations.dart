@@ -291,6 +291,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get filterAll;
+
+  /// Title for the video recording screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Mirror Talk'**
+  String get mirrorTalkTitle;
+
+  /// Prompt shown on the video recording screen for morning.
+  ///
+  /// In en, this message translates to:
+  /// **'Today I will... because...'**
+  String get mirrorTalkPromptMorning;
+
+  /// Prompt shown on the video recording screen for evening.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened today? What can tomorrow learn?'**
+  String get mirrorTalkPromptEvening;
+
+  /// Loading text while camera initializes.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing your private mirror...'**
+  String get mirrorTalkPreparingCamera;
+
+  /// Error text when camera hardware is unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No camera is available on this device.'**
+  String get mirrorTalkNoCamera;
+
+  /// Dialog title when video recording permissions are missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera and microphone access needed'**
+  String get mirrorTalkPermissionTitle;
+
+  /// Dialog body when video recording permissions are missing.
+  ///
+  /// In en, this message translates to:
+  /// **'MirrorTalk records private videos on your device. Please allow camera and microphone access to continue.'**
+  String get mirrorTalkPermissionBody;
+
+  /// Button label to open app settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get mirrorTalkOpenSettings;
+
+  /// Cancel button label.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get mirrorTalkCancel;
+
+  /// Button label to start video recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Start recording'**
+  String get mirrorTalkStartRecording;
+
+  /// Button label to stop video recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get mirrorTalkStopRecording;
+
+  /// Button label to discard a recorded video and record again.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake'**
+  String get mirrorTalkRetake;
+
+  /// Button label to save a recorded mirror talk.
+  ///
+  /// In en, this message translates to:
+  /// **'Save reflection'**
+  String get mirrorTalkSaveReflection;
+
+  /// Label for optional reflection transcript/note field.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection note'**
+  String get mirrorTalkTranscriptLabel;
+
+  /// Hint for optional reflection transcript/note field.
+  ///
+  /// In en, this message translates to:
+  /// **'Write the words you want to keep after the video fades.'**
+  String get mirrorTalkTranscriptHint;
+
+  /// Snackbar text after saving a video reflection.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection saved'**
+  String get mirrorTalkSaved;
+
+  /// Title for the goal suggestions sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested goals'**
+  String get goalSuggestionsTitle;
+
+  /// Label for a goal suggestion text field.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal {index}'**
+  String goalSuggestionLabel(int index);
+
+  /// Button label for applying suggested goals to today's intention.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to Today'**
+  String get goalSuggestionsApply;
 }
 
 class _AppLocalizationsDelegate

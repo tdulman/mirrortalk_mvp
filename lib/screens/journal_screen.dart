@@ -12,10 +12,10 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 
 import 'today_summary_card.dart';
-import 'record_screen.dart';
 import 'entry_detail_screen.dart';
 import 'settings_screen.dart';
 import 'onboarding_screen.dart';
+import 'mirror_talk_record_screen.dart';
 import '../services/prefs_service.dart';
 
 enum FilterRange { today, week, month, all }
@@ -117,7 +117,7 @@ class _JournalScreenState extends State<JournalScreen> {
 
   Future<void> _onAddPressed() async {
     final changed = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => const RecordScreen()),
+      MaterialPageRoute(builder: (_) => const MirrorTalkRecordScreen()),
     );
     if (changed == true) await _reload();
   }

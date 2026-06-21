@@ -131,5 +131,87 @@
   "filterAll": "All",
   "@filterAll": {
     "description": "All journal filter label."
+  },
+  "mirrorTalkTitle": "Mirror Talk",
+  "@mirrorTalkTitle": {
+    "description": "Title for the video recording screen."
+  },
+  "mirrorTalkPromptMorning": "Today I will... because...",
+  "@mirrorTalkPromptMorning": {
+    "description": "Prompt shown on the video recording screen for morning."
+  },
+  "mirrorTalkPromptEvening": "What happened today? What can tomorrow learn?",
+  "@mirrorTalkPromptEvening": {
+    "description": "Prompt shown on the video recording screen for evening."
+  },
+  "mirrorTalkPreparingCamera": "Preparing your private mirror...",
+  "@mirrorTalkPreparingCamera": {
+    "description": "Loading text while camera initializes."
+  },
+  "mirrorTalkNoCamera": "No camera is available on this device.",
+  "@mirrorTalkNoCamera": {
+    "description": "Error text when camera hardware is unavailable."
+  },
+  "mirrorTalkPermissionTitle": "Camera and microphone access needed",
+  "@mirrorTalkPermissionTitle": {
+    "description": "Dialog title when video recording permissions are missing."
+  },
+  "mirrorTalkPermissionBody": "MirrorTalk records private videos on your device. Please allow camera and microphone access to continue.",
+  "@mirrorTalkPermissionBody": {
+    "description": "Dialog body when video recording permissions are missing."
+  },
+  "mirrorTalkOpenSettings": "Open Settings",
+  "@mirrorTalkOpenSettings": {
+    "description": "Button label to open app settings."
+  },
+  "mirrorTalkCancel": "Cancel",
+  "@mirrorTalkCancel": {
+    "description": "Cancel button label."
+  },
+  "mirrorTalkStartRecording": "Start recording",
+  "@mirrorTalkStartRecording": {
+    "description": "Button label to start video recording."
+  },
+  "mirrorTalkStopRecording": "Stop",
+  "@mirrorTalkStopRecording": {
+    "description": "Button label to stop video recording."
+  },
+  "mirrorTalkRetake": "Retake",
+  "@mirrorTalkRetake": {
+    "description": "Button label to discard a recorded video and record again."
+  },
+  "mirrorTalkSaveReflection": "Save reflection",
+  "@mirrorTalkSaveReflection": {
+    "description": "Button label to save a recorded mirror talk."
+  },
+  "mirrorTalkTranscriptLabel": "Reflection note",
+  "@mirrorTalkTranscriptLabel": {
+    "description": "Label for optional reflection transcript/note field."
+  },
+  "mirrorTalkTranscriptHint": "Write the words you want to keep after the video fades.",
+  "@mirrorTalkTranscriptHint": {
+    "description": "Hint for optional reflection transcript/note field."
+  },
+  "mirrorTalkSaved": "Reflection saved",
+  "@mirrorTalkSaved": {
+    "description": "Snackbar text after saving a video reflection."
+  },
+  "goalSuggestionsTitle": "Suggested goals",
+  "@goalSuggestionsTitle": {
+    "description": "Title for the goal suggestions sheet."
+  },
+  "goalSuggestionLabel": "Goal {index}",
+  "@goalSuggestionLabel": {
+    "description": "Label for a goal suggestion text field.",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "goalSuggestionsApply": "Apply to Today",
+  "@goalSuggestionsApply": {
+    "description": "Button label for applying suggested goals to today's intention."
   }
 }

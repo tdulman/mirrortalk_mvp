@@ -110,4 +110,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterAll => 'All';
+
+  @override
+  String get mirrorTalkTitle => 'Mirror Talk';
+
+  @override
+  String get mirrorTalkPromptMorning => 'Today I will... because...';
+
+  @override
+  String get mirrorTalkPromptEvening =>
+      'What happened today? What can tomorrow learn?';
+
+  @override
+  String get mirrorTalkPreparingCamera => 'Preparing your private mirror...';
+
+  @override
+  String get mirrorTalkNoCamera => 'No camera is available on this device.';
+
+  @override
+  String get mirrorTalkPermissionTitle => 'Camera and microphone access needed';
+
+  @override
+  String get mirrorTalkPermissionBody =>
+      'MirrorTalk records private videos on your device. Please allow camera and microphone access to continue.';
+
+  @override
+  String get mirrorTalkOpenSettings => 'Open Settings';
+
+  @override
+  String get mirrorTalkCancel => 'Cancel';
+
+  @override
+  String get mirrorTalkStartRecording => 'Start recording';
+
+  @override
+  String get mirrorTalkStopRecording => 'Stop';
+
+  @override
+  String get mirrorTalkRetake => 'Retake';
+
+  @override
+  String get mirrorTalkSaveReflection => 'Save reflection';
+
+  @override
+  String get mirrorTalkTranscriptLabel => 'Reflection note';
+
+  @override
+  String get mirrorTalkTranscriptHint =>
+      'Write the words you want to keep after the video fades.';
+
+  @override
+  String get mirrorTalkSaved => 'Reflection saved';
+
+  @override
+  String get goalSuggestionsTitle => 'Suggested goals';
+
+  @override
+  String goalSuggestionLabel(int index) {
+    return 'Goal $index';
+  }
+
+  @override
+  String get goalSuggestionsApply => 'Apply to Today';
 }
